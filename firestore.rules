@@ -1,0 +1,36 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function uref(uid) { return /databases/$(database)/documents/users/$(uid); }
+    function signed()  { return request.auth != null && exists(uref(request.auth.uid)); }
+    function isOwner() { return signed() && get(uref(request.auth.uid)).data.role == 'owner'; }
+
+    // Profil pengguna: tiap orang membaca profilnya sendiri, pemilik mengelola semuanya.
+    match /users/{uid} {
+      allow get: if request.auth != null && (request.auth.uid == uid || isOwner());
+      allow list: if isOwner();
+      // Pemilik pertama: hanya bila belum ada pemilik, dan dibuat bersamaan dengan meta/owner.
+      allow create: if (request.auth != null && request.auth.uid == uid
+                        && request.resource.data.role == 'owner'
+                        && !exists(/databases/$(database)/documents/meta/owner)
+                        && getAfter(/databases/$(database)/documents/meta/owner).data.uid == uid)
+                    || (isOwner() && request.resource.data.role == 'staff');
+      allow update, delete: if isOwner() && resource.data.role == 'staff';
+    }
+    match /meta/owner {
+      allow get: if request.auth != null;
+      allow create: if request.auth != null && !exists(/databases/$(database)/documents/meta/owner)
+                    && request.resource.data.uid == request.auth.uid;
+    }
+
+    // Data buku kas
+    match /tx/{id} {
+      allow read, create: if signed();
+      allow update, delete: if isOwner();
+    }
+    match /acc/{id} { allow read: if signed(); allow write: if isOwner(); }
+    match /mv/{id}  { allow read: if signed(); allow write: if isOwner(); }
+    match /settings/{id} { allow read: if signed(); allow write: if isOwner(); }
+  }
+}

@@ -1,0 +1,37 @@
+BUKU KAS D'CELL - versi database online (Firebase)
+
+Hasilnya: data bersama di semua HP, login untuk pemilik dan karyawan, tetap jalan saat sinyal putus
+(catatan dikirim otomatis begitu online lagi). Firebase gratis (paket Spark) cukup untuk satu toko.
+
+A. SIAPKAN FIREBASE (sekali saja, sekitar 10 menit, butuh akun Google)
+1. Buka console.firebase.google.com > Add project > beri nama (mis. kas-dcell). Google Analytics boleh dimatikan.
+2. Menu Build > Authentication > Get started > tab Sign-in method > Email/Password > Enable > Save.
+3. Menu Build > Firestore Database > Create database > pilih lokasi asia-southeast2 (Jakarta)
+   > Start in production mode > Create.
+4. Di Firestore, tab Rules: hapus isinya, tempel seluruh isi file firestore.rules, klik Publish.
+5. Klik ikon roda gigi > Project settings > bagian "Your apps" > ikon web (</>) > beri nama > Register app.
+   Salin isi firebaseConfig (apiKey, authDomain, dst), lalu isikan ke file firebase-config.js
+   (ganti semua tulisan ISI... dengan nilai asli, tanda kutip tetap).
+
+B. UNGGAH KE HOSTING HTTPS
+6. Unggah semua file di folder ini ke hosting (mis. app.netlify.com/drop, seret foldernya).
+7. Buka alamat situsnya. Muncul layar login.
+   Kalau Firebase menolak domain, buka Authentication > Settings > Authorized domains > tambahkan domain situs Anda.
+
+C. PAKAI
+8. Pertama kali: ketuk "Pertama kali? Buat akun pemilik" dan buat akun pemilik. Ini hanya bisa SATU KALI.
+9. Setelah masuk, ketuk "Karyawan" di bawah nama toko untuk membuat akun tiap karyawan (nama, email, kata sandi).
+   Karyawan masuk dengan email dan kata sandi itu di HP-nya.
+10. Karyawan bisa mencatat transaksi. Hanya pemilik yang bisa menghapus/mengubah transaksi, mengatur rekening,
+    saldo, tarif, dan melihat laporan.
+11. Jadi APK: pwabuilder.com > tempel alamat situs > Package for stores > Android.
+
+CATATAN PENTING
+- Isi firebase-config.js (apiKey) memang boleh terlihat publik. Yang melindungi data adalah aturan di firestore.rules,
+  jadi langkah 4 wajib dan jangan memilih "test mode".
+- "Hapus akses" pada karyawan mencabut hak bukanya. Akunnya masih ada di Authentication; bila perlu hapus di sana juga.
+- Lupa kata sandi: ubah lewat Firebase console > Authentication > klik akun > Reset password.
+- Paket gratis membatasi 50.000 pembacaan data per hari. Setiap kali aplikasi dibuka, semua transaksi dibaca.
+  Untuk satu toko dengan beberapa ribu transaksi aman. Bila nanti terasa penuh, minta dibuatkan pembatasan 90 hari terakhir.
+- Backup: rutin pakai Riwayat > Unduh CSV.
+- Setelah mengganti file di hosting, ubah 'kas-dcell-v2' di sw.js jadi v3 agar HP memuat versi baru.
