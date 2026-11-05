@@ -665,7 +665,7 @@ function useDb(db){
   state.mode='db';
   var slow=setTimeout(function(){if(!state.loaded)$('#slow').hidden=false},10000);
   function loaded(){if(!state.loaded){state.loaded=true;clearTimeout(slow)}$('#slow').hidden=true}
-  function fail(){state.loaded=true;clearTimeout(slow);$('#slow').hidden=false;render()}
+  function fail(e){state.loaded=true;clearTimeout(slow);$('#slow').textContent='Data belum bisa dimuat'+(e&&e.code?' (kode: '+e.code+')':'')+'. Periksa koneksi internet, halaman akan terisi otomatis begitu tersambung.';$('#slow').hidden=false;render()}
   function rows(snap){return snap.docs.map(function(d){var o=Object.assign({},d.data());o.id=d.id;return o})}
   db.collection('tx').onSnapshot(function(snap){state.txs=rows(snap);if(!snap.metadata.fromCache)loaded();render()},fail);
   db.collection('acc').onSnapshot(function(snap){state.accs=rows(snap);render()},function(){});
