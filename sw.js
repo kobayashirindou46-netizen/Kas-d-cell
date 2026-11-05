@@ -1,5 +1,5 @@
 /* Service worker Buku Kas D'Cell: aplikasi tetap bisa dibuka tanpa internet */
-var CACHE='kas-dcell-v2';
+var CACHE='kas-dcell-v3';
 var SHELL=['./','index.html','firebase-config.js','manifest.webmanifest','icon-192.png','icon-512.png','icon-maskable-512.png'];
 self.addEventListener('install',function(e){
   e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(SHELL)}).then(function(){return self.skipWaiting()}));
