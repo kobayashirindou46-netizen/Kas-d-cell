@@ -28,15 +28,26 @@
 /* tema warna (terang) */
 :root[data-palette="hijau"]{--bg:#f1f6f3;--surface2:#e6efe9;--rule:#cfdcd3;--accent:#0f7b4f;--accent-ink:#ffffff}
 :root[data-palette="tosca"]{--bg:#f0f7f7;--surface2:#e2f0f0;--rule:#cbe0e0;--accent:#0b7f86;--accent-ink:#ffffff}
+:root[data-palette="langit"]{--bg:#f0f7fc;--surface2:#e1eff8;--rule:#c8e0ef;--accent:#0284c7;--accent-ink:#ffffff}
+:root[data-palette="samudra"]{--bg:#f1f4fb;--surface2:#e3e9f6;--rule:#ccd6ec;--accent:#1e3a8a;--accent-ink:#ffffff}
 :root[data-palette="indigo"]{--bg:#f3f4fc;--surface2:#e7e9f8;--rule:#d3d6ee;--accent:#3f4fd6;--accent-ink:#ffffff}
+:root[data-palette="lavender"]{--bg:#f6f4fc;--surface2:#ece9f8;--rule:#dcd7ee;--accent:#7c6bd6;--accent-ink:#ffffff}
 :root[data-palette="ungu"]{--bg:#f5f3fa;--surface2:#ebe7f5;--rule:#d9d3e8;--accent:#6d3fc0;--accent-ink:#ffffff}
+:root[data-palette="fuchsia"]{--bg:#faf2fa;--surface2:#f3e3f3;--rule:#e6cde6;--accent:#b21fb5;--accent-ink:#ffffff}
 :root[data-palette="mawar"]{--bg:#fbf3f5;--surface2:#f4e6ea;--rule:#e8d2d9;--accent:#c42a5c;--accent-ink:#ffffff}
+:root[data-palette="sakura"]{--bg:#fdf4f7;--surface2:#f8e6ed;--rule:#efd2de;--accent:#d9608a;--accent-ink:#ffffff}
 :root[data-palette="merah"]{--bg:#fbf2f2;--surface2:#f5e4e4;--rule:#ead0d0;--accent:#c62828;--accent-ink:#ffffff}
+:root[data-palette="koral"]{--bg:#fcf4f1;--surface2:#f7e6e1;--rule:#ecd2ca;--accent:#e0573f;--accent-ink:#ffffff}
 :root[data-palette="oranye"]{--bg:#faf5f0;--surface2:#f3e9df;--rule:#e6d7c6;--accent:#c2570c;--accent-ink:#ffffff}
 :root[data-palette="emas"]{--bg:#faf7ee;--surface2:#f3edd9;--rule:#e5dcbc;--accent:#a16d00;--accent-ink:#ffffff}
 :root[data-palette="lime"]{--bg:#f5f8ee;--surface2:#eaf0dc;--rule:#d6e0bc;--accent:#4d7c0f;--accent-ink:#ffffff}
+:root[data-palette="zaitun"]{--bg:#f6f7ee;--surface2:#ecefdc;--rule:#dbe0bf;--accent:#6b7a2a;--accent-ink:#ffffff}
+:root[data-palette="zamrud"]{--bg:#f0f8f5;--surface2:#e0f0ea;--rule:#c6e2d8;--accent:#047857;--accent-ink:#ffffff}
+:root[data-palette="kopi"]{--bg:#f8f3ef;--surface2:#f0e6de;--rule:#e0d0c3;--accent:#6f4e37;--accent-ink:#ffffff}
 :root[data-palette="pasir"]{--bg:#f7f3ed;--surface2:#efe8dd;--rule:#ded4c4;--accent:#7a5c3e;--accent-ink:#ffffff}
+:root[data-palette="batu"]{--bg:#f4f6f8;--surface2:#e6eaef;--rule:#d3d9e1;--accent:#475569;--accent-ink:#ffffff}
 :root[data-palette="grafit"]{--bg:#f3f4f6;--surface2:#e5e7eb;--rule:#d1d5db;--accent:#374151;--accent-ink:#ffffff}
+:root[data-palette="malam"]{--bg:#f2f3f9;--surface2:#e4e7f3;--rule:#d0d4e7;--accent:#2d3a8c;--accent-ink:#ffffff}
 :root[data-palette="mono"]{--bg:#ffffff;--surface2:#f1f3f5;--rule:#e0e3e7;--accent:#111827;--accent-ink:#ffffff}
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
@@ -54,28 +65,50 @@
 @media (prefers-color-scheme: dark){
   :root[data-palette="hijau"]:not([data-theme="light"]){--bg:#0a1712;--surface:#11231b;--surface2:#173226;--rule:#25483a;--accent:#4cc58a;--accent-ink:#06210f}
   :root[data-palette="tosca"]:not([data-theme="light"]){--bg:#08161a;--surface:#0f2429;--surface2:#15333a;--rule:#234a52;--accent:#3cc9d0;--accent-ink:#04272a}
+  :root[data-palette="langit"]:not([data-theme="light"]){--bg:#08141c;--surface:#0f212d;--surface2:#162f3f;--rule:#244a62;--accent:#5cc0f5;--accent-ink:#04283d}
+  :root[data-palette="samudra"]:not([data-theme="light"]){--bg:#0a1224;--surface:#111c36;--surface2:#19284a;--rule:#2a3d6b;--accent:#7ea0f5;--accent-ink:#08183d}
   :root[data-palette="indigo"]:not([data-theme="light"]){--bg:#0d1020;--surface:#151a33;--surface2:#1d2447;--rule:#2e3866;--accent:#8b98ff;--accent-ink:#0a0f3a}
+  :root[data-palette="lavender"]:not([data-theme="light"]){--bg:#131020;--surface:#1c1730;--surface2:#271f40;--rule:#3b3162;--accent:#b5a8f5;--accent-ink:#1d1545}
   :root[data-palette="ungu"]:not([data-theme="light"]){--bg:#120e1c;--surface:#1b1530;--surface2:#261d42;--rule:#3a2d5f;--accent:#a98af0;--accent-ink:#190a38}
+  :root[data-palette="fuchsia"]:not([data-theme="light"]){--bg:#170b17;--surface:#231323;--surface2:#301b30;--rule:#4a2b4a;--accent:#ee7cf0;--accent-ink:#380a3a}
   :root[data-palette="mawar"]:not([data-theme="light"]){--bg:#180d11;--surface:#24141a;--surface2:#321c25;--rule:#4d2b38;--accent:#f07aa0;--accent-ink:#3a0a1c}
+  :root[data-palette="sakura"]:not([data-theme="light"]){--bg:#190f13;--surface:#26171c;--surface2:#341f26;--rule:#4f3340;--accent:#f4a3bf;--accent-ink:#3a0f20}
   :root[data-palette="merah"]:not([data-theme="light"]){--bg:#170c0c;--surface:#231313;--surface2:#311b1b;--rule:#4a2a2a;--accent:#ff7b72;--accent-ink:#3b0a07}
+  :root[data-palette="koral"]:not([data-theme="light"]){--bg:#170e0b;--surface:#241713;--surface2:#32201a;--rule:#4b342b;--accent:#ff9a85;--accent-ink:#3d0f06}
   :root[data-palette="oranye"]:not([data-theme="light"]){--bg:#17110a;--surface:#231a10;--surface2:#31241a;--rule:#4b3826;--accent:#f0a050;--accent-ink:#2a1400}
   :root[data-palette="emas"]:not([data-theme="light"]){--bg:#15120a;--surface:#211c10;--surface2:#2e2716;--rule:#463b20;--accent:#f2c14e;--accent-ink:#2a1d00}
   :root[data-palette="lime"]:not([data-theme="light"]){--bg:#0f150a;--surface:#182110;--surface2:#222e17;--rule:#364a24;--accent:#a3e635;--accent-ink:#1a2e05}
+  :root[data-palette="zaitun"]:not([data-theme="light"]){--bg:#12140a;--surface:#1c2010;--surface2:#272c17;--rule:#3b4224;--accent:#c2d16a;--accent-ink:#222a05}
+  :root[data-palette="zamrud"]:not([data-theme="light"]){--bg:#08161a;--surface:#0e2420;--surface2:#15332d;--rule:#234d44;--accent:#34d3a0;--accent-ink:#03271d}
+  :root[data-palette="kopi"]:not([data-theme="light"]){--bg:#150f0c;--surface:#201814;--surface2:#2d221c;--rule:#443429;--accent:#d4a98a;--accent-ink:#2a160a}
   :root[data-palette="pasir"]:not([data-theme="light"]){--bg:#14110e;--surface:#1e1a15;--surface2:#2a241d;--rule:#40372c;--accent:#d2ae86;--accent-ink:#2a1a0a}
+  :root[data-palette="batu"]:not([data-theme="light"]){--bg:#0e1218;--surface:#161c24;--surface2:#1f2732;--rule:#323d4d;--accent:#9fb0c6;--accent-ink:#0d1626}
   :root[data-palette="grafit"]:not([data-theme="light"]){--bg:#0f1115;--surface:#171a21;--surface2:#20242d;--rule:#333a47;--accent:#cbd5e1;--accent-ink:#0f172a}
+  :root[data-palette="malam"]:not([data-theme="light"]){--bg:#05070f;--surface:#0b101e;--surface2:#121a30;--rule:#223152;--accent:#7aa2ff;--accent-ink:#06143a}
   :root[data-palette="mono"]:not([data-theme="light"]){--bg:#000000;--surface:#0b0b0b;--surface2:#151515;--rule:#2a2a2a;--accent:#ffffff;--accent-ink:#000000}
 }
 :root[data-palette="hijau"][data-theme="dark"]{--bg:#0a1712;--surface:#11231b;--surface2:#173226;--rule:#25483a;--accent:#4cc58a;--accent-ink:#06210f}
 :root[data-palette="tosca"][data-theme="dark"]{--bg:#08161a;--surface:#0f2429;--surface2:#15333a;--rule:#234a52;--accent:#3cc9d0;--accent-ink:#04272a}
+:root[data-palette="langit"][data-theme="dark"]{--bg:#08141c;--surface:#0f212d;--surface2:#162f3f;--rule:#244a62;--accent:#5cc0f5;--accent-ink:#04283d}
+:root[data-palette="samudra"][data-theme="dark"]{--bg:#0a1224;--surface:#111c36;--surface2:#19284a;--rule:#2a3d6b;--accent:#7ea0f5;--accent-ink:#08183d}
 :root[data-palette="indigo"][data-theme="dark"]{--bg:#0d1020;--surface:#151a33;--surface2:#1d2447;--rule:#2e3866;--accent:#8b98ff;--accent-ink:#0a0f3a}
+:root[data-palette="lavender"][data-theme="dark"]{--bg:#131020;--surface:#1c1730;--surface2:#271f40;--rule:#3b3162;--accent:#b5a8f5;--accent-ink:#1d1545}
 :root[data-palette="ungu"][data-theme="dark"]{--bg:#120e1c;--surface:#1b1530;--surface2:#261d42;--rule:#3a2d5f;--accent:#a98af0;--accent-ink:#190a38}
+:root[data-palette="fuchsia"][data-theme="dark"]{--bg:#170b17;--surface:#231323;--surface2:#301b30;--rule:#4a2b4a;--accent:#ee7cf0;--accent-ink:#380a3a}
 :root[data-palette="mawar"][data-theme="dark"]{--bg:#180d11;--surface:#24141a;--surface2:#321c25;--rule:#4d2b38;--accent:#f07aa0;--accent-ink:#3a0a1c}
+:root[data-palette="sakura"][data-theme="dark"]{--bg:#190f13;--surface:#26171c;--surface2:#341f26;--rule:#4f3340;--accent:#f4a3bf;--accent-ink:#3a0f20}
 :root[data-palette="merah"][data-theme="dark"]{--bg:#170c0c;--surface:#231313;--surface2:#311b1b;--rule:#4a2a2a;--accent:#ff7b72;--accent-ink:#3b0a07}
+:root[data-palette="koral"][data-theme="dark"]{--bg:#170e0b;--surface:#241713;--surface2:#32201a;--rule:#4b342b;--accent:#ff9a85;--accent-ink:#3d0f06}
 :root[data-palette="oranye"][data-theme="dark"]{--bg:#17110a;--surface:#231a10;--surface2:#31241a;--rule:#4b3826;--accent:#f0a050;--accent-ink:#2a1400}
 :root[data-palette="emas"][data-theme="dark"]{--bg:#15120a;--surface:#211c10;--surface2:#2e2716;--rule:#463b20;--accent:#f2c14e;--accent-ink:#2a1d00}
 :root[data-palette="lime"][data-theme="dark"]{--bg:#0f150a;--surface:#182110;--surface2:#222e17;--rule:#364a24;--accent:#a3e635;--accent-ink:#1a2e05}
+:root[data-palette="zaitun"][data-theme="dark"]{--bg:#12140a;--surface:#1c2010;--surface2:#272c17;--rule:#3b4224;--accent:#c2d16a;--accent-ink:#222a05}
+:root[data-palette="zamrud"][data-theme="dark"]{--bg:#08161a;--surface:#0e2420;--surface2:#15332d;--rule:#234d44;--accent:#34d3a0;--accent-ink:#03271d}
+:root[data-palette="kopi"][data-theme="dark"]{--bg:#150f0c;--surface:#201814;--surface2:#2d221c;--rule:#443429;--accent:#d4a98a;--accent-ink:#2a160a}
 :root[data-palette="pasir"][data-theme="dark"]{--bg:#14110e;--surface:#1e1a15;--surface2:#2a241d;--rule:#40372c;--accent:#d2ae86;--accent-ink:#2a1a0a}
+:root[data-palette="batu"][data-theme="dark"]{--bg:#0e1218;--surface:#161c24;--surface2:#1f2732;--rule:#323d4d;--accent:#9fb0c6;--accent-ink:#0d1626}
 :root[data-palette="grafit"][data-theme="dark"]{--bg:#0f1115;--surface:#171a21;--surface2:#20242d;--rule:#333a47;--accent:#cbd5e1;--accent-ink:#0f172a}
+:root[data-palette="malam"][data-theme="dark"]{--bg:#05070f;--surface:#0b101e;--surface2:#121a30;--rule:#223152;--accent:#7aa2ff;--accent-ink:#06143a}
 :root[data-palette="mono"][data-theme="dark"]{--bg:#000000;--surface:#0b0b0b;--surface2:#151515;--rule:#2a2a2a;--accent:#ffffff;--accent-ink:#000000}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font:400 14px/1.5 var(--f-body);
@@ -140,6 +173,24 @@ nav a{white-space:nowrap}
 nav a{padding:10px 14px;text-decoration:none;color:var(--muted);font-weight:500;border-bottom:3px solid transparent;margin-bottom:-1px}
 nav a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--accent)}
 nav a:hover{color:var(--ink)}
+
+/* header modern */
+.top{background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 62%,#000));color:var(--accent-ink,#fff);border:0;border-radius:0 0 24px 24px;margin-bottom:20px;box-shadow:0 8px 24px -14px var(--accent)}
+.top .bar{opacity:1;fill:none;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px 12px;padding-block:16px 12px}
+.top .brand{gap:12px}.top .brand b{font:800 19px/1.15 var(--f-display);color:inherit;letter-spacing:.01em}
+.top .brand small{color:inherit;opacity:.8;font-size:12px}
+.top .brand #who:not(:empty){display:inline-block;margin-top:5px;padding:2px 9px;border-radius:99px;background:rgba(255,255,255,.2);opacity:1;font-weight:600}
+.logo{flex:none;width:46px;height:46px;display:block;filter:drop-shadow(0 4px 8px rgba(0,0,0,.25))}.logo svg{width:100%;height:100%;display:block}
+.hact{display:flex;gap:8px}
+.top .thm{position:static;width:40px;height:40px;border-radius:12px;border:0;background:rgba(255,255,255,.18);color:inherit;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.top .thm[aria-current="page"]{background:var(--surface);color:var(--ink)}
+.top .thm:hover{background:rgba(255,255,255,.3)}.top .thm:focus-visible{outline-color:currentColor}
+.top nav{grid-column:1/-1;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;padding:4px;border-radius:14px;background:rgba(0,0,0,.18);overflow:visible}
+.top nav a{text-align:center}
+@media (max-width:480px){.top nav .lg{display:none}.top nav a{padding:9px 4px;font-size:13.5px}}
+.top nav a{border:0;margin:0;border-radius:10px;padding:8px 14px;color:inherit;opacity:.85;font-size:14px}
+.top nav a:hover{opacity:1;color:inherit;background:rgba(255,255,255,.12)}
+.top nav a[aria-current="page"]{background:var(--surface);color:var(--ink);opacity:1;box-shadow:0 2px 6px rgba(0,0,0,.18)}
 
 /* generic blocks */
 .panel{background:var(--surface);border:1px solid var(--rule);border-radius:6px;min-width:0}
@@ -209,6 +260,11 @@ button.acard:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .acard .atop{display:flex;align-items:center;gap:10px;min-width:0}
 .av{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font:700 12px var(--f-display);color:#fff;letter-spacing:.02em}
 .av svg{width:18px;height:18px}
+.setp{margin-bottom:14px}.setp .pad{padding:14px 16px}.prof{display:flex;gap:14px;align-items:center;padding:16px}.prof div{min-width:0}.prof b{display:block;font-size:16px}.prof small{display:block;color:var(--muted);overflow-wrap:anywhere}
+.av.big{width:52px;height:52px;font-size:16px}.av.bk.big{width:60px;border-radius:12px}
+.srows{display:flex;flex-direction:column}.srow{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--rule);color:inherit;font:inherit;padding:13px 16px;cursor:pointer}.srow:first-child{border-top:0}.srow:hover{background:var(--surface2)}.srow b{display:block;font-weight:600}.srow small{display:block;color:var(--muted);font-size:12px}.srow svg{width:18px;height:18px;flex:none;color:var(--muted)}
+.sw4{grid-template-columns:repeat(4,minmax(0,1fr))}@media (max-width:420px){.sw4{grid-template-columns:repeat(3,minmax(0,1fr))}}
+#v-pengaturan[hidden]{display:none}
 .av.bk{border-radius:9px;width:40px;font-size:11px;font-weight:800;letter-spacing:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
 .av.bk.sm{font-size:9px}
 .acard .nm{font-weight:600;font-size:14px;line-height:1.25;overflow-wrap:anywhere;min-width:0}
@@ -345,16 +401,19 @@ details.fmt summary{cursor:pointer;color:var(--muted);font-weight:500}
 <div class="top">
   <div class="wrap bar">
     <div class="brand">
-      <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true"><rect x="3" y="3" width="28" height="28" rx="4" stroke="currentColor" stroke-width="2"/><path d="M3 12h28M12 12v19" stroke="currentColor" stroke-width="2"/><path d="M17 18h9M17 23h9M17 28h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      <div><b>BUKU KAS D'CELL</b><small>Pembukuan harian agen BRILink</small><small id="who"></small><small id="tools"><button class="lnk" type="button" data-theme-open>Tampilan</button></small></div>
+      <span class="logo" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="12" fill="#fff"/><path d="M9 12.5c3.5-1.2 7-1 11 1.5 4-2.5 7.5-2.7 11-1.5V27c-3.5-1.2-7-1-11 1.5-4-2.5-7.5-2.7-11-1.5z" fill="var(--accent)" opacity=".16"/><path d="M9 12.5c3.5-1.2 7-1 11 1.5 4-2.5 7.5-2.7 11-1.5V27c-3.5-1.2-7-1-11 1.5-4-2.5-7.5-2.7-11-1.5zM20 14v14.5" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="30" cy="11" r="5" fill="var(--accent)"/><text x="30" y="13.6" font-size="7" font-weight="800" text-anchor="middle" fill="#fff" font-family="sans-serif">Rp</text></svg></span>
+      <div><b>BUKU KAS D'CELL</b><small>Pembukuan harian agen BRILink</small><small id="who"></small><small id="tools"></small></div>
+    </div>
+    <div class="hact">
+      <a class="thm" href="#pengaturan" aria-label="Pengaturan" style="display:grid;place-items:center;color:inherit"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></a>
+      <button class="thm" id="themeBtn" type="button" aria-label="Ganti tampilan"></button>
     </div>
     <nav aria-label="Menu utama">
       <a href="#beranda" data-tab="beranda">Dashboard</a>
-      <a href="#j-transfer" data-tab="jenis">Input Transaksi</a>
+      <a href="#j-transfer" data-tab="jenis">Input<span class="lg"> Transaksi</span></a>
       <a href="#transaksi" data-tab="transaksi">Riwayat</a>
       <a href="#laporan" data-tab="laporan" class="own">Laporan</a>
     </nav>
-    <button class="thm" id="themeBtn" type="button" aria-label="Ganti tampilan"></button>
   </div>
 </div>
 
@@ -476,6 +535,9 @@ details.fmt summary{cursor:pointer;color:var(--muted);font-weight:500}
       </div>
     </div>
   </section>
+
+  <!-- PENGATURAN -->
+  <section id="v-pengaturan" hidden aria-label="Pengaturan"><div id="setBody"></div></section>
 
   <!-- LAPORAN -->
   <section id="v-laporan" hidden aria-label="Laporan">
@@ -917,6 +979,29 @@ function renderReport(){
 function hasExamples(){
   return state.settings.example||state.txs.some(function(t){return t.example})||state.mvs.some(function(m){return m.example})||state.accs.some(function(a){return a.example});
 }
+
+var setSig='';
+function renderSettings(){
+  var own=state.role==='owner',db=state.mode==='db',nm=state.myName||(own?'Pemilik':'Karyawan');
+  var modes=[['auto','Otomatis'],['light','Terang'],['dark','Gelap']];
+  var sig=[own,db,nm,state.email||'',theme.mode,theme.pal,THEMES.length].join('|');
+  if(sig===setSig&&$('#setBody').firstChild)return;setSig=sig;
+  var row=function(attr,t,d){return '<button type="button" class="srow" '+attr+'><span><b>'+t+'</b><small>'+d+'</small></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>'};
+  var h='<div class="panel setp"><header><h2>Profil</h2></header><div class="prof">'+'<span class="av big" style="background:var(--accent);color:var(--accent-ink)" aria-hidden="true">'+esc(initials(nm))+'</span>'+
+    '<div><b>'+esc(nm)+'</b><small>'+(own?'Pemilik':'Karyawan')+(db?'':' · mode lokal')+'</small>'+(state.email?'<small>'+esc(state.email)+'</small>':'')+'</div></div>'+
+    (db?'<div class="srows">'+row('data-acct="pw"','Ganti kata sandi','Kirim tautan ubah kata sandi ke email')+'</div>':'')+'</div>'+
+    '<div class="panel setp"><header><h2>Tampilan</h2></header><div class="pad"><div class="seg" role="group" aria-label="Mode">'+modes.map(function(m){return '<button type="button" data-tmode="'+m[0]+'" aria-pressed="'+(theme.mode===m[0])+'">'+m[1]+'</button>'}).join('')+'</div>'+
+    '<div class="sw sw4" role="group" aria-label="Warna">'+THEMES.map(function(t){return '<button type="button" data-tpal="'+t[0]+'" aria-pressed="'+(theme.pal===t[0])+'"><i style="background:linear-gradient(135deg,'+t[2]+' 50%,'+t[3]+' 50%)"></i>'+t[1]+'</button>'}).join('')+'</div>'+
+    '<p class="hint">Pilihan tampilan tersimpan di perangkat ini.</p></div></div>';
+  if(own)h+='<div class="panel setp"><header><h2>Pengelolaan</h2></header><div class="srows">'+
+    (db?row('data-acct="staff"','Karyawan','Tambah atau hapus akun karyawan'):'')+
+    row('data-tarif="tarif"','Tarif admin dan potongan','Atur tarif otomatis per nominal')+
+    row('data-tarif="loyal"','Pelanggan loyal','Tarif admin khusus pelanggan tetap')+
+    row('data-addmenu','Tambah menu transaksi','Buat jenis transaksi sendiri')+
+    row('data-wa','Tempel pesan WhatsApp','Impor catatan dari WhatsApp')+'</div></div>';
+  if(db)h+='<div class="panel setp"><div class="srows">'+row('data-acct="out"','Keluar','Keluar dari akun ini di perangkat ini')+'</div></div>';
+  $('#setBody').innerHTML=h;
+}
 function renderWho(){
   var el=$('#who');
   el.textContent=state.mode==='db'?(state.myName?state.myName+' · ':'')+(state.role==='owner'?'Pemilik':'Karyawan'):'';
@@ -943,6 +1028,7 @@ function render(){
   if(view==='transaksi')renderTx();
   if(view==='jenis')renderJenis();
   if(view==='laporan')renderReport();
+  if(view==='pengaturan')renderSettings();
   resolvePeople();
 }
 
@@ -1476,7 +1562,7 @@ function exportCsv(){
 
 /* ---------- navigasi ---------- */
 /* ---------- tema: mode terang/gelap dan warna ---------- */
-var THEMES=[['biru','Biru','#0a5ea8','#5aa9ec'],['hijau','Hijau','#0f7b4f','#4cc58a'],['tosca','Tosca','#0b7f86','#3cc9d0'],['indigo','Indigo','#3f4fd6','#8b98ff'],['ungu','Ungu','#6d3fc0','#a98af0'],['mawar','Mawar','#c42a5c','#f07aa0'],['merah','Merah','#c62828','#ff7b72'],['oranye','Oranye','#c2570c','#f0a050'],['emas','Emas','#a16d00','#f2c14e'],['lime','Lime','#4d7c0f','#a3e635'],['pasir','Pasir','#7a5c3e','#d2ae86'],['grafit','Grafit','#374151','#cbd5e1'],['mono','Mono','#111827','#ffffff']];
+var THEMES=[['biru','Biru','#0a5ea8','#5aa9ec'],['hijau','Hijau','#0f7b4f','#4cc58a'],['tosca','Tosca','#0b7f86','#3cc9d0'],['langit','Langit','#0284c7','#5cc0f5'],['samudra','Samudra','#1e3a8a','#7ea0f5'],['indigo','Indigo','#3f4fd6','#8b98ff'],['lavender','Lavender','#7c6bd6','#b5a8f5'],['ungu','Ungu','#6d3fc0','#a98af0'],['fuchsia','Fuchsia','#b21fb5','#ee7cf0'],['mawar','Mawar','#c42a5c','#f07aa0'],['sakura','Sakura','#d9608a','#f4a3bf'],['merah','Merah','#c62828','#ff7b72'],['koral','Koral','#e0573f','#ff9a85'],['oranye','Oranye','#c2570c','#f0a050'],['emas','Emas','#a16d00','#f2c14e'],['lime','Lime','#4d7c0f','#a3e635'],['zaitun','Zaitun','#6b7a2a','#c2d16a'],['zamrud','Zamrud','#047857','#34d3a0'],['kopi','Kopi','#6f4e37','#d4a98a'],['pasir','Pasir','#7a5c3e','#d2ae86'],['batu','Batu','#475569','#9fb0c6'],['grafit','Grafit','#374151','#cbd5e1'],['malam','Malam','#2d3a8c','#7aa2ff'],['mono','Mono','#111827','#ffffff']];
 var theme={mode:'auto',pal:'biru'};
 try{var _t=JSON.parse(localStorage.getItem('kas-tema')||'null');if(_t&&_t.mode)theme=_t;else{var _o=localStorage.getItem('kas-theme');if(_o==='light'||_o==='dark')theme.mode=_o}}catch(e){}
 function applyTheme(){
@@ -1559,11 +1645,12 @@ function renderJenis(){
 function route(){
   var h=(location.hash||'').replace('#','');
   jt=h.indexOf('j-')===0&&TYPES[h.slice(2)]?h.slice(2):'';
-  view=jt?'jenis':(['beranda','transaksi','laporan'].indexOf(h)>=0?h:'beranda');
+  view=jt?'jenis':(['beranda','transaksi','laporan','pengaturan'].indexOf(h)>=0?h:'beranda');
   if(view==='laporan'&&state.role!=='owner')view='beranda';
-  ['beranda','transaksi','laporan','jenis'].forEach(function(v){$('#v-'+v).hidden=v!==view});
+  ['beranda','transaksi','laporan','jenis','pengaturan'].forEach(function(v){$('#v-'+v).hidden=v!==view});
   placeEntry();
   var tabKey=jt?'jenis':view;
+  var gb=document.querySelector('a.thm[href="#pengaturan"]');if(gb){if(view==='pengaturan')gb.setAttribute('aria-current','page');else gb.removeAttribute('aria-current')}
   document.querySelectorAll('nav a').forEach(function(a){if(a.dataset.tab===tabKey)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
   render();
 }
@@ -1751,7 +1838,7 @@ function glueBoot(){
     }};
     state.downloads=csvSaver();$('#tCsv').hidden=false;
     wall(false);
-    if(!$('#acct'))$('#tools').insertAdjacentHTML('beforeend','<span id="acct">'+(state.role==='owner'?'<button class="lnk" type="button" data-acct="staff">Karyawan</button>':'')+'<button class="lnk" type="button" data-acct="out">Keluar</button></span>');
+    state.email=u.email||'';
     useDb(fs);route();
   }
   function getProfile(u){return fs.doc('users/'+u.uid).get().catch(function(){return fs.doc('users/'+u.uid).get({source:'cache'})})}
@@ -1784,6 +1871,7 @@ function glueBoot(){
   document.addEventListener('click',function(ev){
     var a=ev.target.closest&&ev.target.closest('[data-acct]');if(a){
       if(a.dataset.acct==='out'){auth.signOut().then(function(){location.reload()},function(){location.reload()})}
+      else if(a.dataset.acct==='pw'){var em=auth.currentUser&&auth.currentUser.email;if(em)auth.sendPasswordResetEmail(em).then(function(){toast('Tautan ubah kata sandi dikirim ke '+em)},function(e){toast(fbMsg(e))})}
       else openStaff();return;
     }
     var d=ev.target.closest&&ev.target.closest('[data-delstaff]');if(d)delStaff(d.dataset.delstaff,d);
