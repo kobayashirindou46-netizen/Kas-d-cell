@@ -9,9 +9,30 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Kas D'Cell">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="favicon-64.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-startup-image" href="splash-750x1334.jpg" media="(device-width:375px) and (device-height:667px) and (-webkit-device-pixel-ratio:2) and (orientation:portrait)">
+<link rel="apple-touch-startup-image" href="splash-828x1792.jpg" media="(device-width:414px) and (device-height:896px) and (-webkit-device-pixel-ratio:2) and (orientation:portrait)">
+<link rel="apple-touch-startup-image" href="splash-1125x2436.jpg" media="(device-width:375px) and (device-height:812px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)">
+<link rel="apple-touch-startup-image" href="splash-1170x2532.jpg" media="(device-width:390px) and (device-height:844px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)">
+<link rel="apple-touch-startup-image" href="splash-1179x2556.jpg" media="(device-width:393px) and (device-height:852px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)">
+<link rel="apple-touch-startup-image" href="splash-1242x2688.jpg" media="(device-width:414px) and (device-height:896px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)">
+<link rel="apple-touch-startup-image" href="splash-1284x2778.jpg" media="(device-width:428px) and (device-height:926px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)">
+<link rel="apple-touch-startup-image" href="splash-1290x2796.jpg" media="(device-width:430px) and (device-height:932px) and (-webkit-device-pixel-ratio:3) and (orientation:portrait)">
 <title>Buku Kas D'Cell</title>
+<style id="splashCss">
+#splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;background:linear-gradient(160deg,#1580d8,#083f7d);color:#fff;transition:opacity .4s ease,visibility .4s;font-family:Inter,system-ui,sans-serif}
+#splash.out{opacity:0;visibility:hidden;pointer-events:none}
+#splash img{width:112px;height:112px;border-radius:26px;box-shadow:0 14px 34px rgba(0,0,0,.35);animation:spPop .7s cubic-bezier(.2,.9,.3,1.2) both}
+#splash b{margin-top:22px;font-size:22px;font-weight:800;letter-spacing:.02em;animation:spUp .6s .15s ease both}
+#splash small{margin-top:6px;font-size:13px;opacity:.78;animation:spUp .6s .25s ease both}
+#splash i{margin-top:34px;width:34px;height:34px;border-radius:50%;border:3px solid rgba(255,255,255,.28);border-top-color:#fff;animation:spSpin .9s linear infinite}
+@keyframes spPop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+@keyframes spUp{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+@keyframes spSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){#splash *{animation:none!important}#splash{transition:none}}
+</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=M+PLUS+Rounded+1c:wght@500;700;800&family=Pirata+One&family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Lora:wght@400;600;700&family=Orbitron:wght@600;800&family=Shippori+Mincho+B1:wght@700;800&display=swap">
@@ -183,11 +204,12 @@ nav a:hover{color:var(--ink)}
 .logo{flex:none;width:46px;height:46px;display:block;filter:drop-shadow(0 4px 8px rgba(0,0,0,.25))}.logo svg{width:100%;height:100%;display:block}
 .hact{display:flex;gap:8px}
 .top .thm{position:static;width:40px;height:40px;border-radius:12px;border:0;background:rgba(255,255,255,.18);color:inherit;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-.top .thm[aria-current="page"]{background:var(--surface);color:var(--ink)}
+.top .thm[aria-current="page"]{background:var(--surface);color:var(--ink)!important}
 .top .thm:hover{background:rgba(255,255,255,.3)}.top .thm:focus-visible{outline-color:currentColor}
 .top nav{grid-column:1/-1;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;padding:4px;border-radius:14px;background:rgba(0,0,0,.18);overflow:visible}
 .top nav a{text-align:center}
-@media (max-width:480px){.top nav .lg{display:none}.top nav a{padding:9px 4px;font-size:13.5px}}
+@media (max-width:480px){.top nav .lg{display:none}.top nav a{padding:9px 2px!important;font-size:13px}}
+@media (max-width:420px){.top nav a{font-size:12.5px!important}}
 .top nav a{border:0;margin:0;border-radius:10px;padding:8px 14px;color:inherit;opacity:.85;font-size:14px}
 .top nav a:hover{opacity:1;color:inherit;background:rgba(255,255,255,.12)}
 .top nav a[aria-current="page"]{background:var(--surface);color:var(--ink);opacity:1;box-shadow:0 2px 6px rgba(0,0,0,.18)}
@@ -635,6 +657,12 @@ html:root[data-font="mono"]{--f-body:'IBM Plex Mono',ui-monospace,Menlo,monospac
 </style>
 </head>
 <body>
+<div id="splash" role="status" aria-label="Memuat aplikasi"><img src="logo-splash.png" alt="" width="112" height="112"><b>BUKU KAS D'CELL</b><small>Pembukuan harian agen BRILink</small><i aria-hidden="true"></i></div>
+<script>(function(){var t0=Date.now(),el=document.getElementById('splash'),done=false;
+function hide(){if(done||!el)return;done=true;el.classList.add('out');setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el)},500)}
+function go(){var w=Math.max(0,900-(Date.now()-t0));setTimeout(hide,w)}
+if(document.readyState==='complete')go();else window.addEventListener('load',go);
+setTimeout(hide,3500)})()</script>
 
 <div class="top">
   <div class="wrap bar">
@@ -735,12 +763,6 @@ html:root[data-font="mono"]{--f-body:'IBM Plex Mono',ui-monospace,Menlo,monospac
       </div>
     </div>
 
-    <div class="side">
-      <div class="panel">
-        <header><h2>Transaksi terbaru</h2><a href="#transaksi">Lihat semua</a></header>
-        <div class="scroll" id="recent"></div>
-      </div>
-    </div>
   </section>
 
   <!-- PER JENIS -->
@@ -1184,9 +1206,6 @@ function renderHome(){
   var cur=renderBalances();
   renderAccounts(cur);
   updateAccSelect(cur);
-  var recent=state.txs.slice().sort(sortTx).slice(0,5);
-  $('#recent').innerHTML=recent.length?
-    '<table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Keterangan</th><th class="n">Nominal</th><th class="n own">Laba</th></tr></thead><tbody>'+recent.map(function(t){return rowHtml(t,false,false)}).join('')+'</tbody></table>':emptyHtml();
 }
 
 function filteredTx(){
@@ -2253,27 +2272,49 @@ function glueBoot(){
   FBM={fb:fb,auth:auth,fs:fs};
   try{var pr=fs.enablePersistence({synchronizeTabs:true});if(pr&&pr.catch)pr.catch(function(){})}catch(e){}
   var st=document.createElement('style');
-  st.textContent='#wall{position:fixed;inset:0;z-index:200;background:var(--bg);display:grid;place-items:center;padding:16px;overflow:auto}#wall[hidden]{display:none}.wallc{width:min(380px,100%);background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:22px;display:grid;gap:12px}.wallc h1{font:800 22px/1.1 var(--f-display);margin:0}.wallc .hint{margin:0}.lnk.x{}.stl{margin-top:14px}.stl .mrow small{color:var(--muted)}';
+  st.textContent='#wall{position:fixed;inset:0;z-index:200;background:var(--bg);display:grid;place-items:center;padding:16px;overflow:auto}#wall[hidden]{display:none}.wallc{width:min(380px,100%);background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:22px;display:grid;gap:12px}.wallc h1{font:800 22px/1.1 var(--f-display);margin:0}.wallc .hint{margin:0}.lnk.x{}.stl{margin-top:14px}.stl .mrow small{color:var(--muted)}'+
+    '#wall{background:linear-gradient(160deg,#1580d8 0%,#0a5ea8 45%,#083f7d 100%);padding:max(20px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom));place-items:center}'+
+    '#wall:before,#wall:after{content:"";position:absolute;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,255,255,.18),rgba(255,255,255,0) 70%)}#wall:before{width:420px;height:420px;top:-140px;left:-120px}#wall:after{width:380px;height:380px;bottom:-140px;right:-120px}'+
+    '.wallw{position:relative;width:min(400px,100%);display:grid;gap:18px;justify-items:center;z-index:1;margin:auto}'+
+    '.wbrand{display:grid;gap:8px;justify-items:center;text-align:center;color:#fff}.wbrand img{width:84px;height:84px;border-radius:22px;box-shadow:0 12px 30px rgba(0,0,0,.35)}.wbrand b{font:800 22px/1.15 var(--f-display);letter-spacing:.02em}.wbrand small{opacity:.8;font-size:13px}'+
+    '.wallc{width:100%;background:var(--surface);color:var(--ink);border:0;border-radius:22px;padding:24px 22px 20px;display:grid;gap:14px;box-shadow:0 24px 60px -18px rgba(0,0,0,.5)}'+
+    '.wallc h1{font:800 21px/1.15 var(--f-display);margin:0}.wallc .hint{margin:-6px 0 2px;color:var(--muted);font-size:13.5px;line-height:1.45}'+
+    '.wf{display:grid;gap:6px}.wf>label{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.03em}'+
+    '.wi{position:relative;display:flex;align-items:center}.wi>svg{position:absolute;left:13px;width:18px;height:18px;color:var(--muted);pointer-events:none}'+
+    '.wi input{width:100%;height:48px;padding:0 44px 0 42px;border:1.5px solid var(--rule);border-radius:12px;background:var(--bg);color:var(--ink);font:500 15px inherit;font-family:inherit}'+
+    '.wi input:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 20%,transparent);background:var(--surface)}'+
+    '.wi .weye{position:absolute;right:6px;width:36px;height:36px;border:0;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer;border-radius:10px}.wi .weye:hover{color:var(--accent)}.wi .weye svg{width:19px;height:19px}'+
+    '.wallc .err{margin:0;min-height:0;font-size:13px;color:var(--neg)}.wallc .err:empty{display:none}'+
+    '#wGo{height:50px;border:0;border-radius:13px;background:linear-gradient(135deg,#1580d8,#083f7d);color:#fff;font:700 15.5px inherit;font-family:inherit;cursor:pointer;box-shadow:0 10px 22px -10px #0a5ea8;transition:transform .12s,filter .15s}#wGo:hover{filter:brightness(1.08)}#wGo:active{transform:scale(.985)}#wGo:disabled{opacity:.6;cursor:wait}#wGo:focus-visible{outline:3px solid color-mix(in srgb,#1580d8 45%,transparent);outline-offset:2px}'+
+    '.wlinks{display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:2px}.wallc .lnk{padding:0;text-decoration:none;font-weight:600;font-size:13.5px}.wallc .lnk:hover{text-decoration:underline}.wallc #wSwitch{color:var(--muted);font-weight:500}'+
+    '.wfoot{color:rgba(255,255,255,.7);font-size:12px;text-align:center}';
   document.head.appendChild(st);
   var w=document.createElement('div');w.id='wall';w.hidden=true;
-  w.innerHTML='<form id="wallF" class="wallc"><h1>BUKU KAS D\'CELL</h1><p class="hint" id="wHint">Masuk untuk membuka buku kas.</p>'+
-    '<div class="field" id="wNameF" hidden><label class="l" for="wName">Nama Anda</label><input id="wName" type="text" maxlength="40" autocomplete="name"></div>'+
-    '<div class="field"><label class="l" for="wEmail">Email</label><input id="wEmail" type="email" autocomplete="username" required></div>'+
-    '<div class="field"><label class="l" for="wPass">Kata sandi</label><input id="wPass" type="password" autocomplete="current-password" required></div>'+
+  var IC={mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7.5l8 6 8-6"/></svg>',
+    lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="3"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/></svg>',
+    user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20a7.5 7.5 0 0115 0"/></svg>',
+    eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>'};
+  w.innerHTML='<div class="wallw"><div class="wbrand"><img src="logo-splash.png" alt="" width="84" height="84"><b>BUKU KAS D\'CELL</b><small>Pembukuan harian agen BRILink</small></div>'+
+    '<form id="wallF" class="wallc"><h1 id="wTitle">Selamat datang</h1><p class="hint" id="wHint">Masuk untuk membuka buku kas.</p>'+
+    '<div class="wf" id="wNameF" hidden><label for="wName">Nama Anda</label><div class="wi">'+IC.user+'<input id="wName" type="text" maxlength="40" autocomplete="name" placeholder="Nama lengkap"></div></div>'+
+    '<div class="wf"><label for="wEmail">Email</label><div class="wi">'+IC.mail+'<input id="wEmail" type="email" autocomplete="username" placeholder="nama@email.com" required></div></div>'+
+    '<div class="wf"><label for="wPass">Kata sandi</label><div class="wi">'+IC.lock+'<input id="wPass" type="password" autocomplete="current-password" placeholder="Kata sandi" required><button type="button" class="weye" id="wEye" aria-label="Tampilkan kata sandi">'+IC.eye+'</button></div></div>'+
     '<p class="err" id="wErr" role="alert"></p><button class="btn primary" type="submit" id="wGo">Masuk</button>'+
-    '<button class="lnk" type="button" id="wForgot">Lupa kata sandi?</button>'+
-    '<button class="lnk" type="button" id="wSwitch">Pertama kali? Buat akun pemilik</button></form>';
+    '<div class="wlinks"><button class="lnk" type="button" id="wForgot">Lupa kata sandi?</button>'+
+    '<button class="lnk" type="button" id="wSwitch">Pertama kali? Buat akun pemilik</button></div></form>'+
+    '<div class="wfoot">Data tersimpan aman dan tersinkron di semua perangkat</div></div>';
   document.body.appendChild(w);
   var creating=false,started=false,mkOwner=false;
   function wall(on){w.hidden=!on}
   function werr(m){$('#wErr').textContent=m||''}
   function setMode(o){
-    mkOwner=o;$('#wNameF').hidden=!o;$('#wGo').textContent=o?'Buat akun pemilik':'Masuk';
+    mkOwner=o;$('#wNameF').hidden=!o;$('#wGo').textContent=o?'Buat akun pemilik':'Masuk';$('#wTitle').textContent=o?'Buat akun pemilik':'Selamat datang';
     $('#wSwitch').textContent=o?'Sudah punya akun? Masuk':'Pertama kali? Buat akun pemilik';
     $('#wHint').textContent=o?'Akun pemilik hanya bisa dibuat satu kali. Karyawan dibuatkan akun oleh pemilik setelah masuk.':'Masuk untuk membuka buku kas.';
     $('#wPass').autocomplete=o?'new-password':'current-password';werr('');
   }
   $('#wSwitch').addEventListener('click',function(){setMode(!mkOwner)});
+  $('#wEye').addEventListener('click',function(){var i=$('#wPass'),sh=i.type==='password';i.type=sh?'text':'password';this.setAttribute('aria-label',sh?'Sembunyikan kata sandi':'Tampilkan kata sandi')});
   $('#wForgot').addEventListener('click',function(){
     var email=$('#wEmail').value.trim();
     if(!email){werr('Isi email Anda dulu di kolom Email, lalu ketuk Lupa kata sandi.');return}

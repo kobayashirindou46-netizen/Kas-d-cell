@@ -35,3 +35,12 @@ CATATAN PENTING
   Untuk satu toko dengan beberapa ribu transaksi aman. Bila nanti terasa penuh, minta dibuatkan pembatasan 90 hari terakhir.
 - Backup: rutin pakai Riwayat > Unduh CSV.
 - Setelah mengganti file di hosting, ubah 'kas-dcell-v2' di sw.js jadi v3 agar HP memuat versi baru.
+
+
+C. CATATAN PEMASANGAN DI HP (GitHub Pages)
+- Unggah SEMUA file di folder ini (index.html, manifest.webmanifest, sw.js, firebase-config.js, semua icon-*.png,
+  apple-touch-icon.png, favicon-64.png, logo-splash.png, dan semua splash-*.jpg). Jangan ada yang terlewat.
+- Pasang lewat Chrome: menu titik tiga > Instal aplikasi (atau Tambahkan ke layar utama).
+- Kalau ikon lama masih tampil: hapus aplikasi lama dari HP, lalu pasang ulang. Android menyimpan ikon lama.
+- Layar pembuka (splash): di Android otomatis dari manifest, di iPhone dari file splash-*.jpg, dan di dalam
+  aplikasi ada layar pembuka singkat dengan logo.

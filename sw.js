@@ -1,8 +1,9 @@
 /* Service worker Buku Kas D'Cell: aplikasi tetap bisa dibuka tanpa internet */
-var CACHE='kas-dcell-v3';
-var SHELL=['./','index.html','firebase-config.js','manifest.webmanifest','icon-192.png','icon-512.png','icon-maskable-512.png'];
+var CACHE='kas-dcell-v4';
+var SHELL=['./','index.html','firebase-config.js','manifest.webmanifest','icon-192.png','icon-512.png','icon-maskable-512.png','apple-touch-icon.png','favicon-64.png'];
 self.addEventListener('install',function(e){
-  e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(SHELL)}).then(function(){return self.skipWaiting()}));
+  /* satu per satu: kalau satu file belum terunggah, pemasangan service worker tidak ikut gagal */
+  e.waitUntil(caches.open(CACHE).then(function(c){return Promise.all(SHELL.map(function(u){return c.add(u).catch(function(){})}))}).then(function(){return self.skipWaiting()}));
 });
 self.addEventListener('activate',function(e){
   e.waitUntil(caches.keys().then(function(k){return Promise.all(k.filter(function(x){return x!==CACHE}).map(function(x){return caches.delete(x)}))}).then(function(){return self.clients.claim()}));
