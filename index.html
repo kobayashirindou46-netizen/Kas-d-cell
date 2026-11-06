@@ -424,6 +424,17 @@ legend,label.l{display:block;font-size:12px;font-weight:600;color:var(--muted);t
 .jit.on .jck::after{content:"";position:absolute;left:6px;top:2px;width:4px;height:9px;border:solid var(--accent-ink);border-width:0 2px 2px 0;transform:rotate(45deg)}
 @media (min-width:600px){.jsheet{align-items:center}.jpanel{border-radius:22px;border-bottom:1px solid var(--rule);max-width:420px;padding-bottom:14px;transform:translateY(16px) scale(.98);opacity:0;transition:transform .2s,opacity .2s}.jsheet.open .jpanel{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.jpanel,.jback,.jbtn .jch{transition:none}}
+.rng{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px}.rng .rl{font:700 12px var(--f-body,inherit);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.rng button{height:36px;padding:0 15px;border-radius:999px;border:1px solid var(--rule);background:var(--surface);color:var(--ink);font:600 13.5px var(--f-body,inherit);cursor:pointer;transition:border-color .15s,background .15s}.rng button:hover{border-color:var(--accent)}.rng button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+@media (max-width:480px){.rng .rl{flex-basis:100%;margin:0}.rng{gap:8px 6px}.rng button{flex:1;padding:0 6px}.filters .jbtn{padding:0 10px;gap:6px;font-size:14px}.filters .jbtn .jbi{display:none}}
+.mpb{flex:none}.field .mpb{width:100%}.jhead .mpb{width:auto;min-width:170px;height:38px}.jbtn.ph .jtx{color:var(--muted)}
+.mpyr{display:flex;align-items:center;justify-content:space-between;padding:2px 4px 14px}.mpyr b{font:800 20px var(--f-display,inherit);letter-spacing:.02em}
+.mpyr button{width:40px;height:40px;border-radius:12px;border:1px solid var(--rule);background:var(--surface2);color:var(--ink);display:grid;place-items:center;cursor:pointer}.mpyr button:hover{border-color:var(--accent);color:var(--accent)}.mpyr svg{width:20px;height:20px}
+.mpg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:0 2px}
+.mpm{height:50px;border:1px solid var(--rule);border-radius:14px;background:var(--surface2);color:var(--ink);font:600 15px var(--f-body,inherit);cursor:pointer;transition:transform .1s,border-color .15s}
+.mpm:hover{border-color:var(--accent)}.mpm:active{transform:scale(.97)}.mpm.now{border-color:var(--accent);color:var(--accent)}
+.mpm.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.mpf{display:flex;gap:8px;padding:14px 2px 4px}.mpf button{flex:1;height:46px;border-radius:13px;border:1px solid var(--rule);background:transparent;color:var(--accent);font:600 14.5px var(--f-body,inherit);cursor:pointer}.mpf button:hover{background:var(--surface2)}.mpf button[hidden]{display:none}
 /* pemilih bank dan e-wallet */
 .field .jbtn{width:100%;flex:none}
 .jbtn.ph .jtx{color:var(--muted);font-weight:500}
@@ -780,6 +791,7 @@ setTimeout(hide,3500)})()</script>
 
   <!-- TRANSAKSI -->
   <section id="v-transaksi" hidden aria-label="Daftar transaksi">
+    <div class="rng" id="tRng" role="group" aria-label="Rentang cepat"><span class="rl">Lihat cepat</span><button type="button" data-r="1" aria-pressed="false">Hari ini</button><button type="button" data-r="3" aria-pressed="false">3 hari</button><button type="button" data-r="7" aria-pressed="false">7 hari</button><button type="button" data-r="30" aria-pressed="false">30 hari</button></div>
     <div class="filters">
       <div class="field"><label class="l" for="tMonth">Bulan</label><input id="tMonth" type="month"></div>
       <div class="field"><label class="l" for="tType">Jenis</label><select id="tType"></select></div>
@@ -1208,10 +1220,20 @@ function renderHome(){
   updateAccSelect(cur);
 }
 
+var tRange=0;
+function rangeFrom(){var d=new Date();d.setDate(d.getDate()-(tRange-1));return ymd(d)}
+function inRng(dt){return dt>=rangeFrom()&&dt<=today()}
+function paintRng(){document.querySelectorAll('#tRng [data-r]').forEach(function(b){var on=+b.dataset.r===tRange;b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))})}
+function setRange(n){
+  tRange=n;
+  if(n)$('#tMonth').value='';else if(!$('#tMonth').value)$('#tMonth').value=currentMonth();
+  paintRng();renderTx();
+}
 function filteredTx(){
   var m=$('#tMonth').value,ty=$('#tType').value,q=$('#tQ').value.trim().toLowerCase();
   return state.txs.filter(function(t){
-    if(m&&t.date.slice(0,7)!==m)return false;
+    if(tRange){if(!inRng(t.date))return false}
+    else if(m&&t.date.slice(0,7)!==m)return false;
     if(ty&&t.type!==ty)return false;
     if(q&&((t.name||'')+' '+(t.note||'')).toLowerCase().indexOf(q)<0)return false;
     return true;
@@ -1219,7 +1241,7 @@ function filteredTx(){
 }
 function renderTx(){
   var list=filteredTx();
-  if(!list.length){$('#txTable').innerHTML=state.txs.length?'<div class="empty"><b>Tidak ada transaksi yang cocok</b>Ubah bulan, jenis, atau kata pencarian.</div>':emptyHtml()}
+  if(!list.length){$('#txTable').innerHTML=state.txs.length?'<div class="empty"><b>Tidak ada transaksi yang cocok</b>Ubah bulan, rentang hari, jenis, atau kata pencarian.</div>':emptyHtml()}
   else{
     var s=sum(list);
     $('#txTable').innerHTML='<table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Keterangan</th><th class="n">Nominal</th><th class="n own">Admin</th><th class="n own">Komisi</th><th class="n own">Laba</th><th class="own"></th></tr></thead><tbody>'+
@@ -1227,7 +1249,7 @@ function renderTx(){
       '</tbody><tfoot><tr><td colspan="3">'+s.n+' transaksi</td><td class="n">'+rp(s.nominal)+'</td><td class="n own">'+rp(s.fee)+'</td><td class="n own">'+rp(s.komisi)+'</td><td class="n own '+(s.laba<0?'neg':'pos')+'">'+rpS(s.laba)+'</td><td class="own"></td></tr></tfoot></table>';
   }
   var m=$('#tMonth').value;
-  var mv=state.mvs.filter(function(x){return !m||x.date.slice(0,7)===m}).sort(sortTx);
+  var mv=state.mvs.filter(function(x){return tRange?inRng(x.date):(!m||x.date.slice(0,7)===m)}).sort(sortTx);
   $('#mvTable').innerHTML=mv.length?
     '<table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Rekening</th><th class="n">Nominal</th><th class="n">Biaya</th><th>Catatan</th><th></th></tr></thead><tbody>'+
     mv.map(function(x){
@@ -1330,10 +1352,10 @@ function buildTypes(){
   $('#types').innerHTML=ORDER.map(function(k,i){return '<label><input type="radio" name="jenis" value="'+k+'"'+(i===0?' checked':'')+'><span>'+TYPES[k].label+'</span></label>'}).join('');
   $('#tType').innerHTML='<option value="">Semua jenis</option>'+ORDER.map(function(k){return '<option value="'+k+'">'+TYPES[k].label+'</option>'}).join('');
   if(keep&&TYPES[keep]){var kr=document.querySelector('input[name="jenis"][value="'+keep+'"]');if(kr)kr.checked=true}
-  $('#tType').value=keepF;
+  $('#tType').value=keepF;$('#tType').dataset.all='1';$('#tType').dataset.ico='type';
   $('#fBt').innerHTML='<option value="">Pilih bank penerima</option>'+BANKS_TUJ.map(function(n){return '<option value="'+n+'">'+n+'</option>'}).join('');
   $('#fEw').innerHTML='<option value="">Pilih e-wallet</option>'+EW.map(function(n){return '<option value="'+n+'">'+n+'</option>'}).join('');
-  msInit('fBt','Pilih bank penerima');msInit('fEw','Pilih e-wallet tujuan');
+  msInit('fBt','Pilih bank penerima');msInit('fEw','Pilih e-wallet tujuan');msInit('tType','Pilih jenis transaksi');
 }
 function curAdm(){var r=document.querySelector('input[name="adm"]:checked');return r?r.value:'luar'}
 function buildAdm(){
@@ -1906,11 +1928,13 @@ function msInitials(t){
 }
 var MS_ICON={fBt:'<path d="M3 10l9-6 9 6M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18"/>',fEw:'<path d="M4 8h16v11H4zM4 8l2-3h12M16 13.5h2"/>'};
 function msSvg(id){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(MS_ICON[id]||MS_ICON.fBt)+'</svg>'}
+var MS_ALL='<path d="M4 6h16M4 12h16M4 18h10"/>';
+function msTypeIco(v){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(v?(NAVI[v]||NAVI.isi):MS_ALL)+'</svg>'}
 function msSync(id){
   var sel=$('#'+id),b=$('#'+id+'Btn');if(!sel||!b)return;
-  var o=sel.options[sel.selectedIndex],has=!!(o&&o.value!=='');
-  b.querySelector('.jtx').textContent=has?o.textContent:(sel.options[0]?sel.options[0].textContent:'Pilih');
-  b.querySelector('.jbi').innerHTML=has?esc(msInitials(o.textContent)):msSvg(id);
+  var o=sel.options[sel.selectedIndex],has=!!(o&&o.value!==''),all=sel.dataset.all==='1';
+  b.querySelector('.jtx').textContent=(has||all)?(o?o.textContent:''):(sel.options[0]?sel.options[0].textContent:'Pilih');
+  b.querySelector('.jbi').innerHTML=sel.dataset.ico==='type'?msTypeIco(o&&o.value):(has?esc(msInitials(o.textContent)):msSvg(id));
   b.classList.toggle('ph',!has);
 }
 function msInit(id,title){
@@ -1935,7 +1959,7 @@ function msMake(){
     if(e.target.closest('[data-msclose]')){msClose();return}
     var it=e.target.closest('.jit');if(!it)return;
     var sel=$('#'+msId);sel.value=it.dataset.v;
-    sel.dispatchEvent(new Event('change',{bubbles:true}));
+    sel.dispatchEvent(new Event('input',{bubbles:true}));sel.dispatchEvent(new Event('change',{bubbles:true}));
     msSync(msId);msClose();
   });
   $('#msSearch').addEventListener('input',function(){
@@ -1949,9 +1973,9 @@ function msOpen(id,title){
   msMake();msId=id;
   var sel=$('#'+id),cur=sel.value,h='',n=0;
   Array.prototype.forEach.call(sel.options,function(o){
-    if(o.value==='')return;n++;
+    if(o.value===''&&sel.dataset.all!=='1')return;n++;
     var on=o.value===cur;
-    h+='<button type="button" class="jit'+(on?' on':'')+'" role="option" aria-selected="'+on+'" data-v="'+esc(o.value)+'"><span class="jico ini">'+esc(msInitials(o.textContent))+'</span><span class="jlb">'+esc(o.textContent)+'</span><span class="jck"></span></button>';
+    h+='<button type="button" class="jit'+(on?' on':'')+'" role="option" aria-selected="'+on+'" data-v="'+esc(o.value)+'"><span class="jico'+(sel.dataset.ico==='type'?'':' ini')+'">'+(sel.dataset.ico==='type'?msTypeIco(o.value):esc(msInitials(o.textContent)))+'</span><span class="jlb">'+esc(o.textContent)+'</span><span class="jck"></span></button>';
   });
   $('#msTitle').textContent=title;
   $('#msList').innerHTML=h+'<div class="jemp" id="msEmpty" hidden>Tidak ditemukan</div>';
@@ -1965,6 +1989,56 @@ function msClose(){
   var b=$('#'+msId+'Btn');if(b)b.setAttribute('aria-expanded','false');
   document.documentElement.style.overflow='';
 }
+
+/* ---------- pemilih bulan modern ---------- */
+var MP_BLN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'],MP_SHORT=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+var mpEl=null,mpId='',mpYear=0,mpOpts={};
+function mpLabel(v){var m=/^(\d{4})-(\d{2})$/.exec(v||'');return m?MP_BLN[+m[2]-1]+' '+m[1]:'Semua bulan'}
+function mpSync(id){var b=$('#'+id+'Btn');if(!b)return;var v=$('#'+id).value;b.querySelector('.jtx').textContent=mpLabel(v);b.classList.toggle('ph',!v)}
+function mpInit(id,clearable){
+  var inp=$('#'+id);if(!inp||$('#'+id+'Btn'))return;
+  var d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');
+  Object.defineProperty(inp,'value',{configurable:true,get:function(){return d.get.call(inp)},set:function(v){d.set.call(inp,v);mpSync(id)}});
+  inp.style.display='none';
+  var b=document.createElement('button');b.type='button';b.className='jbtn mpb';b.id=id+'Btn';b.setAttribute('aria-haspopup','dialog');b.setAttribute('aria-expanded','false');
+  b.innerHTML='<span class="jbi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span><span class="jtx"></span><svg class="jch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  inp.parentNode.insertBefore(b,inp.nextSibling);
+  var lb=document.querySelector('label[for="'+id+'"]');if(lb)lb.htmlFor=b.id;
+  b.addEventListener('click',function(){mpOpen(id,!!clearable)});
+  mpSync(id);
+}
+function mpMake(){
+  if(mpEl)return;
+  mpEl=document.createElement('div');mpEl.className='jsheet';mpEl.id='mpSheet';
+  mpEl.innerHTML='<div class="jback" data-mpclose></div><div class="jpanel" role="dialog" aria-label="Pilih bulan"><div class="jgrab" aria-hidden="true"></div><div class="jhd">Pilih bulan</div>'+
+    '<div class="mpyr"><button type="button" id="mpPrev" aria-label="Tahun sebelumnya"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><b id="mpYr"></b><button type="button" id="mpNext" aria-label="Tahun berikutnya"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button></div>'+
+    '<div class="mpg" id="mpGrid"></div><div class="mpf"><button type="button" id="mpNow">Bulan ini</button><button type="button" id="mpClr">Semua bulan</button></div></div>';
+  document.body.appendChild(mpEl);
+  mpEl.addEventListener('click',function(e){
+    if(e.target.closest('[data-mpclose]')){mpClose();return}
+    var m=e.target.closest('.mpm');if(m){mpSet(mpYear+'-'+('0'+m.dataset.m).slice(-2));return}
+    if(e.target.closest('#mpPrev')){mpYear--;mpDraw();return}
+    if(e.target.closest('#mpNext')){mpYear++;mpDraw();return}
+    if(e.target.closest('#mpNow')){mpSet(currentMonth());return}
+    if(e.target.closest('#mpClr')){mpSet('');return}
+  });
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&mpEl.classList.contains('open'))mpClose()});
+}
+function mpDraw(){
+  var cur=$('#'+mpId).value,now=currentMonth(),h='';
+  $('#mpYr').textContent=mpYear;
+  for(var i=1;i<=12;i++){var v=mpYear+'-'+('0'+i).slice(-2);h+='<button type="button" class="mpm'+(v===cur?' on':'')+(v===now?' now':'')+'" data-m="'+i+'" aria-pressed="'+(v===cur)+'">'+MP_SHORT[i-1]+'</button>'}
+  $('#mpGrid').innerHTML=h;
+}
+function mpOpen(id,clearable){
+  mpMake();mpId=id;
+  var m=/^(\d{4})-/.exec($('#'+id).value||currentMonth());mpYear=+m[1];
+  $('#mpClr').hidden=!clearable;mpDraw();
+  mpEl.classList.add('open');$('#'+id+'Btn').setAttribute('aria-expanded','true');
+  document.documentElement.style.overflow='hidden';
+}
+function mpClose(){if(!mpEl)return;mpEl.classList.remove('open');var b=$('#'+mpId+'Btn');if(b)b.setAttribute('aria-expanded','false');document.documentElement.style.overflow=''}
+function mpSet(v){var inp=$('#'+mpId);inp.value=v;inp.dispatchEvent(new Event('input',{bubbles:true}));inp.dispatchEvent(new Event('change',{bubbles:true}));mpClose()}
 function buildSel(){jMake();jFill();
   var el=$('#jSel');if(!el)return;
   el.innerHTML=ORDER.map(function(k){return '<option value="'+k+'">'+esc(TL[k]||TYPES[k].label)+'</option>'}).join('');
@@ -2153,6 +2227,7 @@ function init(){
   $('#fDate').value=today();
   $('#tMonth').value=currentMonth();
   $('#rMonth').value=currentMonth();
+  mpInit('jMonth');mpInit('tMonth',true);mpInit('rMonth');
   $('#fFee').addEventListener('input',function(ev){if(ev.isTrusted)touched.adm=true});
   $('#fBf').addEventListener('input',function(ev){if(ev.isTrusted)touched.bf=true});
   ['#fAmount','#fFee','#fKom','#fBf','#fModal'].forEach(function(s){fmtInput($(s),updateForm)});
@@ -2200,8 +2275,10 @@ function init(){
   $('#clearEx').addEventListener('click',function(){store.clearExamples().then(function(){toast('Data contoh dihapus')})});
   $('#shForm').addEventListener('submit',sheetSubmit);
 
-  ['#tMonth','#tType','#tQ'].forEach(function(s){$(s).addEventListener('input',renderTx)});
-  $('#tAll').addEventListener('click',function(){$('#tMonth').value='';renderTx()});
+  ['#tType','#tQ'].forEach(function(s){$(s).addEventListener('input',renderTx)});
+  $('#tMonth').addEventListener('input',function(){tRange=0;paintRng();renderTx()});
+  $('#tAll').addEventListener('click',function(){tRange=0;$('#tMonth').value='';paintRng();renderTx()});
+  $('#tRng').addEventListener('click',function(e){var b=e.target.closest('[data-r]');if(!b)return;var n=+b.dataset.r;setRange(n===tRange?0:n)});
   $('#rMonth').addEventListener('input',renderReport);
   $('#tCsv').addEventListener('click',exportCsv);
 
