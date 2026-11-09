@@ -665,6 +665,24 @@ html:root[data-font="lora"]{--f-body:'Lora',Georgia,serif;--f-display:'Lora',Geo
 html:root[data-font="mono"]{--f-body:'IBM Plex Mono',ui-monospace,Menlo,monospace;--f-display:'IBM Plex Mono',ui-monospace,Menlo,monospace}
 .tlab{font-size:12px;font-weight:600;color:var(--muted);margin:14px 0 -4px}
 .faa{flex:none;width:26px;text-align:center;font-weight:700;font-size:15px;line-height:1}
+
+/* ===== Dashboard: tampilan baru ===== */
+.bcard.total{position:relative;overflow:hidden;border:0;border-radius:18px;padding:18px 18px 16px;background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 62%,#000));box-shadow:0 8px 22px color-mix(in srgb,var(--accent) 30%,transparent)}
+.bcard.total::after{content:"";position:absolute;right:-40px;top:-50px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%);pointer-events:none}
+.bcard.total strong{font-size:30px;letter-spacing:-.01em}
+.bcard.total small{display:inline-block;margin-top:10px;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.18);opacity:1}
+.bsub{gap:10px;border-top:0;padding-top:0;margin-top:14px}
+.bsub>div{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.14)}
+.stats{gap:10px;border:0;background:transparent;margin-top:14px}
+.stats div,.stats div:first-child,.stats div:nth-child(n){border:1px solid var(--rule)!important;border-radius:14px;padding:12px 14px;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.stats span{font-size:12px;letter-spacing:.02em}
+.stats strong{display:block;margin-top:2px;font-size:16px}
+.stats div:has(.pos){background:color-mix(in srgb,var(--pos) 9%,var(--surface));border-color:color-mix(in srgb,var(--pos) 35%,var(--rule))!important}
+.stats div:has(.neg){background:color-mix(in srgb,var(--neg) 9%,var(--surface));border-color:color-mix(in srgb,var(--neg) 35%,var(--rule))!important}
+#stats{grid-auto-flow:row;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.acard{border-radius:14px;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.05);transition:transform .12s,box-shadow .12s}
+button.acard:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.acard .amt{font-weight:600;letter-spacing:-.01em}
 </style>
 </head>
 <body>
@@ -980,8 +998,8 @@ function sum(list){
 /* ringkasan transaksi ditambah biaya pindah saldo */
 function mvFees(list){return list.reduce(function(a,m){return a+(m.type==='pindah'?(+m.fee||0):0)},0)}
 function agg(txList,mvList){var s=sum(txList),f=mvFees(mvList||[]);s.moveFee=f;s.keluar+=f;s.laba-=f;return s}
-/* uang tunai yang benar-benar masuk/keluar dari laci (bukan laba) */
-function cashFlow(list){var m=0,k=0;(list||[]).forEach(function(t){var e=fx(t).kas||0;if(e>0)m+=e;else k+=-e});return {masuk:m,keluar:k}}
+/* pemasukan dan pengeluaran = hanya transaksi yang diinput sebagai jenis Pemasukan dan Pengeluaran */
+function cashFlow(list){var m=0,k=0;(list||[]).forEach(function(t){var l=lk(t.type),a=+t.amount||0;if(l==='masuk')m+=a;else if(l==='keluar')k+=a});return {masuk:m,keluar:k}}
 
 /* ---------- data contoh ---------- */
 var EXACC=[['acc-bri','BRI','bank',6000000],['acc-bni','BNI','bank',6000000],['acc-dana','DANA','ewallet',500000]];
@@ -1117,8 +1135,8 @@ function renderBalances(){
   var td=agg(tdT,tdM),cf=cashFlow(tdT);
   $('#stats').innerHTML=
     '<div><span>Transaksi hari ini</span><strong>'+td.n+'</strong></div>'+
-    '<div><span>Pemasukan hari ini</span><strong class="pos">'+rp(cf.masuk)+'</strong></div>'+
-    '<div><span>Pengeluaran hari ini</span><strong class="neg">'+rp(cf.keluar)+'</strong></div>'+
+    (cf.masuk?'<div><span>Pemasukan hari ini</span><strong class="pos">'+rp(cf.masuk)+'</strong></div>':'')+
+    (cf.keluar?'<div><span>Pengeluaran hari ini</span><strong class="neg">'+rp(cf.keluar)+'</strong></div>':'')+
     '<div class="own"><span>Laba hari ini</span><strong class="'+(td.laba<0?'neg':td.laba>0?'pos':'')+'">'+rpS(td.laba)+'</strong></div>';
   return cur;
 }
@@ -1270,8 +1288,8 @@ function renderReport(){
   var s=agg(list,mvl),cfm=cashFlow(list);
   $('#rStats').innerHTML=
     '<div><span>Transaksi</span><strong>'+s.n+'</strong></div>'+
-    '<div><span>Pemasukan bulan ini</span><strong class="pos">'+rp(cfm.masuk)+'</strong></div>'+
-    '<div><span>Pengeluaran bulan ini</span><strong class="neg">'+rp(cfm.keluar)+'</strong></div>'+
+    (cfm.masuk?'<div><span>Pemasukan bulan ini</span><strong class="pos">'+rp(cfm.masuk)+'</strong></div>':'')+
+    (cfm.keluar?'<div><span>Pengeluaran bulan ini</span><strong class="neg">'+rp(cfm.keluar)+'</strong></div>':'')+
     '<div><span>Total nominal</span><strong>'+rp(s.nominal)+'</strong></div>'+
     '<div><span>Admin dan komisi</span><strong>'+rp(s.fee+s.komisi)+'</strong></div>'+
     '<div><span>Laba bersih</span><strong class="'+(s.laba<0?'neg':s.laba>0?'pos':'')+'">'+rpS(s.laba)+'</strong></div>';
