@@ -953,7 +953,7 @@ function toast(msg,detail){var t=$('#toast');clearTimeout(toastT);
 
 /* ---------- state ---------- */
 /* role: owner = pemilik atau Editor, staff = karyawan (Kontributor). Awalnya staff sampai peran diketahui. */
-var state={txs:[],accs:[],mvs:[],settings:{kasAwal:0},loaded:false,mode:'',downloads:null,role:'staff',user:null,uid:'',myName:'',people:{}};
+var state={txs:[],accs:[],mvs:[],settings:{kasAwal:0},loaded:false,mode:'',downloads:null,role:'staff',shopId:'',user:null,uid:'',myName:'',people:{}};
 var store={};
 
 function accsOf(kind){return state.accs.filter(function(a){return a.kind===kind}).sort(function(a,b){return (a.createdAt||0)-(b.createdAt||0)||String(a.name).localeCompare(b.name)})}
@@ -1053,29 +1053,30 @@ function clearEx(){
 }
 
 function useDb(db){
+  function P(p){return state.shopId?'shops/'+state.shopId+'/'+p:p}
   state.mode='db';
   var slow=setTimeout(function(){if(!state.loaded)$('#slow').hidden=false},10000);
   function loaded(){if(!state.loaded){state.loaded=true;clearTimeout(slow)}$('#slow').hidden=true}
   function fail(e){state.loaded=true;clearTimeout(slow);$('#slow').textContent='Data belum bisa dimuat'+(e&&e.code?' (kode: '+e.code+')':'')+'. Periksa koneksi internet, halaman akan terisi otomatis begitu tersambung.';$('#slow').hidden=false;render()}
   function rows(snap){return snap.docs.map(function(d){var o=Object.assign({},d.data());o.id=d.id;return o})}
-  db.collection('tx').onSnapshot(function(snap){state.txs=rows(snap);if(!snap.metadata.fromCache)loaded();render()},fail);
-  db.collection('acc').onSnapshot(function(snap){state.accs=rows(snap);render()},function(){});
-  db.collection('mv').onSnapshot(function(snap){state.mvs=rows(snap);render()},function(){});
-  db.doc('settings/main').onSnapshot(function(s){if(s.exists)state.settings=Object.assign({kasAwal:0},s.data());render()},function(){});
-  store.add=function(t){if(state.uid)t.by=state.uid;return db.collection('tx').add(t)};
-  store.remove=function(id){return db.doc('tx/'+id).delete()};
-  store.addMv=function(m){if(state.uid)m.by=state.uid;return db.collection('mv').add(m)};
-  store.removeMv=function(id){return db.doc('mv/'+id).delete()};
-  store.addAcc=function(a){return db.collection('acc').add(a)};
-  store.updateAcc=function(id,p){return db.doc('acc/'+id).update(p)};
-  store.removeAcc=function(id){return db.doc('acc/'+id).delete()};
-  store.setSettings=function(s){return db.doc('settings/main').set(Object.assign({},state.settings,s))};
+  db.collection(P('tx')).onSnapshot(function(snap){state.txs=rows(snap);if(!snap.metadata.fromCache)loaded();render()},fail);
+  db.collection(P('acc')).onSnapshot(function(snap){state.accs=rows(snap);render()},function(){});
+  db.collection(P('mv')).onSnapshot(function(snap){state.mvs=rows(snap);render()},function(){});
+  db.doc(P('settings/main')).onSnapshot(function(s){if(s.exists)state.settings=Object.assign({kasAwal:0},s.data());render()},function(){});
+  store.add=function(t){if(state.uid)t.by=state.uid;return db.collection(P('tx')).add(t)};
+  store.remove=function(id){return db.doc(P('tx/'+id)).delete()};
+  store.addMv=function(m){if(state.uid)m.by=state.uid;return db.collection(P('mv')).add(m)};
+  store.removeMv=function(id){return db.doc(P('mv/'+id)).delete()};
+  store.addAcc=function(a){return db.collection(P('acc')).add(a)};
+  store.updateAcc=function(id,p){return db.doc(P('acc/'+id)).update(p)};
+  store.removeAcc=function(id){return db.doc(P('acc/'+id)).delete()};
+  store.setSettings=function(s){return db.doc(P('settings/main')).set(Object.assign({},state.settings,s))};
   store.clearExamples=function(){
     var jobs=[];
-    state.txs.forEach(function(t){if(t.example)jobs.push(db.doc('tx/'+t.id).delete())});
-    state.mvs.forEach(function(m){if(m.example)jobs.push(db.doc('mv/'+m.id).delete())});
-    state.accs.forEach(function(a){if(a.example&&!referenced(a.id))jobs.push(db.doc('acc/'+a.id).delete())});
-    if(state.settings.example)jobs.push(db.doc('settings/main').set({kasAwal:0}));
+    state.txs.forEach(function(t){if(t.example)jobs.push(db.doc(P('tx/'+t.id)).delete())});
+    state.mvs.forEach(function(m){if(m.example)jobs.push(db.doc(P('mv/'+m.id)).delete())});
+    state.accs.forEach(function(a){if(a.example&&!referenced(a.id))jobs.push(db.doc(P('acc/'+a.id)).delete())});
+    if(state.settings.example)jobs.push(db.doc(P('settings/main')).set({kasAwal:0}));
     return Promise.all(jobs);
   };
 }
@@ -2406,16 +2407,16 @@ function glueBoot(){
     '<div class="wf"><label for="wPass">Kata sandi</label><div class="wi">'+IC.lock+'<input id="wPass" type="password" autocomplete="current-password" placeholder="Kata sandi" required><button type="button" class="weye" id="wEye" aria-label="Tampilkan kata sandi">'+IC.eye+'</button></div></div>'+
     '<p class="err" id="wErr" role="alert"></p><button class="btn primary" type="submit" id="wGo">Masuk</button>'+
     '<div class="wlinks"><button class="lnk" type="button" id="wForgot">Lupa kata sandi?</button>'+
-    '<button class="lnk" type="button" id="wSwitch">Pertama kali? Buat akun pemilik</button></div></form>'+
+    '<button class="lnk" type="button" id="wSwitch">Belum punya akun? Daftar</button></div></form>'+
     '<div class="wfoot">Data tersimpan aman dan tersinkron di semua perangkat</div></div>';
   document.body.appendChild(w);
   var creating=false,started=false,mkOwner=false;
   function wall(on){w.hidden=!on}
   function werr(m){$('#wErr').textContent=m||''}
   function setMode(o){
-    mkOwner=o;$('#wNameF').hidden=!o;$('#wGo').textContent=o?'Buat akun pemilik':'Masuk';$('#wTitle').textContent=o?'Buat akun pemilik':'Selamat datang';
-    $('#wSwitch').textContent=o?'Sudah punya akun? Masuk':'Pertama kali? Buat akun pemilik';
-    $('#wHint').textContent=o?'Akun pemilik hanya bisa dibuat satu kali. Karyawan dibuatkan akun oleh pemilik setelah masuk.':'Masuk untuk membuka buku kas.';
+    mkOwner=o;$('#wNameF').hidden=!o;$('#wGo').textContent=o?'Daftar akun baru':'Masuk';$('#wTitle').textContent=o?'Daftar akun baru':'Selamat datang';
+    $('#wSwitch').textContent=o?'Sudah punya akun? Masuk':'Belum punya akun? Daftar';
+    $('#wHint').textContent=o?'Setiap akun punya buku kas sendiri yang tidak bisa dilihat akun lain. Karyawan dibuatkan akun oleh pemilik setelah masuk.':'Masuk untuk membuka buku kas.';
     $('#wPass').autocomplete=o?'new-password':'current-password';werr('');
   }
   $('#wSwitch').addEventListener('click',function(){setMode(!mkOwner)});
@@ -2431,7 +2432,10 @@ function glueBoot(){
     setTimeout(function(){URL.revokeObjectURL(a.href)},1500);return Promise.resolve({status:'saved'});
   }}}
   function start(u,prof){
-    if(started)return;started=true;
+    if(started)return;
+    if(prof.role!=='owner'&&!prof.shopId){wall(true);werr('Data toko ini sedang diperbarui. Minta pemilik membuka aplikasi dulu, lalu masuk lagi.');auth.signOut();return}
+    started=true;
+    state.shopId=prof.role==='owner'?u.uid:prof.shopId;
     state.role=prof.role==='owner'?'owner':'staff';state.uid=u.uid;state.myName=prof.name||'';
     state.user={profiles:function(ids){
       return Promise.all(ids.map(function(id){return fs.doc('users/'+id).get().catch(function(){return {exists:false}})})).then(function(ds){
@@ -2443,13 +2447,40 @@ function glueBoot(){
     state.email=u.email||'';
     useDb(fs);route();
   }
+  function commitAll(ops){
+    var p=Promise.resolve();
+    for(var i=0;i<ops.length;i+=400){(function(part){p=p.then(function(){var b=fs.batch();part.forEach(function(o){if(o.merge)b.set(o.ref,o.data,{merge:true});else b.set(o.ref,o.data)});return b.commit()})})(ops.slice(i,i+400))}
+    return p;
+  }
+  /* sekali jalan: pindahkan data lama (koleksi tx/acc/mv/settings di akar) ke shops/{uid}/... milik pemilik lama */
+  function migrate(u){
+    var uid=u.uid,base='shops/'+uid+'/',cols=['tx','acc','mv'];
+    return Promise.all(cols.map(function(c){return fs.collection(c).get()}).concat([fs.doc('settings/main').get(),fs.collection('users').get()])).then(function(r){
+      var data=[],staff=[];
+      cols.forEach(function(c,i){r[i].docs.forEach(function(d){data.push({ref:fs.doc(base+c+'/'+d.id),data:d.data()})})});
+      if(r[3].exists)data.push({ref:fs.doc(base+'settings/main'),data:r[3].data()});
+      r[4].docs.forEach(function(d){var x=d.data();if(d.id!==uid&&x.role==='staff'&&!x.shopId)staff.push({ref:d.ref,data:{shopId:uid},merge:true})});
+      return commitAll([{ref:fs.doc('users/'+uid),data:{shopId:uid,role:'owner'},merge:true}])
+        .then(function(){return commitAll(data)})
+        .then(function(){return commitAll(staff)})
+        .then(function(){return commitAll([{ref:fs.doc('users/'+uid),data:{legacyDone:true},merge:true}])});
+    });
+  }
+  function boot(u,prof){
+    if(prof.role==='owner'&&!prof.legacyDone){
+      wall(true);$('#wHint').textContent='Memindahkan data lama ke akun Anda. Jangan tutup halaman ini...';
+      migrate(u).then(function(){prof.legacyDone=true;prof.shopId=u.uid;start(u,prof)},function(e){$('#wHint').textContent='';werr('Pemindahan data gagal'+(e&&e.code?' ('+e.code+')':'')+'. Periksa koneksi lalu muat ulang halaman.')});
+      return;
+    }
+    start(u,prof);
+  }
   function getProfile(u){return fs.doc('users/'+u.uid).get().catch(function(){return fs.doc('users/'+u.uid).get({source:'cache'})})}
   auth.onAuthStateChanged(function(u){
     if(creating)return;
     if(!u){started=false;wall(true);return}
     getProfile(u).then(function(d){
-      if(!d.exists){wall(true);werr('Akun ini belum terdaftar sebagai pemilik atau karyawan. Hubungi pemilik.');auth.signOut();return}
-      start(u,d.data());
+      if(!d.exists){wall(true);werr('Akun ini belum terdaftar. Daftar dulu, atau hubungi pemilik toko Anda.');auth.signOut();return}
+      boot(u,d.data());
     },function(){wall(true);werr('Tidak bisa memuat akun. Periksa koneksi internet lalu muat ulang.')});
   });
   $('#wallF').addEventListener('submit',function(ev){
@@ -2461,12 +2492,10 @@ function glueBoot(){
     if(!mkOwner){auth.signInWithEmailAndPassword(email,pw).then(done,function(e){werr(fbMsg(e));done()});return}
     creating=true;
     auth.createUserWithEmailAndPassword(email,pw).then(function(c){
-      var b=fs.batch(),now=Date.now();
-      b.set(fs.doc('meta/owner'),{uid:c.user.uid,createdAt:now});
-      b.set(fs.doc('users/'+c.user.uid),{name:name,role:'owner',email:email,createdAt:now});
-      return b.commit().then(function(){creating=false;start(c.user,{name:name,role:'owner'});done()},function(){
+      var prof={name:name,role:'owner',email:email,shopId:c.user.uid,legacyDone:true,createdAt:Date.now()};
+      return fs.doc('users/'+c.user.uid).set(prof).then(function(){creating=false;start(c.user,prof);done()},function(){
         creating=false;
-        return c.user.delete().catch(function(){}).then(function(){werr('Akun pemilik sudah pernah dibuat. Minta pemilik membuatkan akun karyawan untuk Anda.');done()});
+        return c.user.delete().catch(function(){}).then(function(){werr('Gagal membuat akun. Periksa koneksi internet lalu coba lagi.');done()});
       });
     },function(e){creating=false;werr(fbMsg(e));done()});
   });
@@ -2490,7 +2519,7 @@ function openStaff(){
 }
 function loadStaff(){
   var box=$('#stList');if(!box)return;
-  FBM.fs.collection('users').get().then(function(snap){
+  FBM.fs.collection('users').where('shopId','==',state.shopId).get().then(function(snap){
     var rows=snap.docs.filter(function(d){return d.data().role==='staff'});
     box.innerHTML=rows.length?'<b class="l">Akun karyawan</b>'+rows.map(function(d){var x=d.data();return '<div class="mrow"><span>'+esc(x.name||'Karyawan')+'<br><small>'+esc(x.email||'')+'</small></span><button type="button" class="btn small" data-delstaff="'+esc(d.id)+'">Hapus akses</button></div>'}).join(''):'<p class="hint">Belum ada karyawan.</p>';
   },function(){box.innerHTML='<p class="hint">Daftar karyawan belum bisa dimuat.</p>'});
@@ -2506,7 +2535,7 @@ function glueStaffAdd(){
   var b=$('#shOk');b.disabled=true;
   var sec=FBM.fb.initializeApp(window.FIREBASE_CONFIG,'sec'+Date.now()),sa=sec.auth();
   sa.createUserWithEmailAndPassword(email,pw).then(function(c){
-    return FBM.fs.doc('users/'+c.user.uid).set({name:name,role:'staff',email:email,createdAt:Date.now()});
+    return FBM.fs.doc('users/'+c.user.uid).set({name:name,role:'staff',email:email,shopId:state.shopId,createdAt:Date.now()});
   }).then(function(){return sa.signOut()}).then(function(){
     sec.delete();b.disabled=false;toast('Karyawan ditambahkan');
     ['#stName','#stEmail','#stPass'].forEach(function(s){$(s).value=''});loadStaff();
