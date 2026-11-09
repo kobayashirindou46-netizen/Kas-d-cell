@@ -865,7 +865,7 @@ var TYPES={
   transfer:{label:'Transfer',fee:true,acc:true,dest:true,accL:'Rekening sumber dana',name:'Nama pelanggan / penerima',amount:'Nominal transfer'},
   tarik:{label:'Tarik tunai',fee:true,acc:true,accL:'Bank penampung (tujuan)',name:'Nama pelanggan / pengirim',amount:'Nominal penarikan'},
   setor:{label:'Setor tunai',fee:true,acc:true,accL:'Rekening sumber dana',name:'Nama pelanggan',amount:'Nominal setoran'},
-  topup:{label:'Top up e-wallet',fee:true,acc:true,accL:'Bank pengirim',name:'Nama pelanggan',amount:'Nominal top up'},
+  topup:{label:'Top up e-wallet',fee:true,acc:true,accL:'Rekening pengirim (bank / e-wallet)',name:'Nama pelanggan',amount:'Nominal top up'},
   bayar:{label:'Bayar tagihan',fee:true,acc:true,accL:'Rekening sumber dana',name:'Nama tagihan / pelanggan',amount:'Nominal tagihan'},
   isi:{label:'Isi saldo agen',fee:false,acc:true,accL:'Rekening tujuan',name:'Sumber dana',amount:'Nominal isi saldo'},
   keluar:{label:'Pengeluaran',fee:false,acc:false,accL:'',name:'Keperluan',amount:'Jumlah pengeluaran'},
@@ -889,7 +889,7 @@ var ADM={luar:['Luar','Nasabah bayar tunai'],dalam:['Dalam','Transfer + admin'],
 function fx(t){
   var a=+t.amount||0,f=+t.fee||0,k=+t.komisi||0,b=+t.bf||0;
   switch(lk(t.type)){
-    /* top up e-wallet: saldo bank pengirim berkurang, pelanggan bayar tunai nominal + admin */
+    /* top up e-wallet: saldo rekening pengirim (bank atau e-wallet) berkurang, pelanggan bayar tunai nominal + admin */
     case 'transfer': case 'setor': case 'bayar': case 'topup':
       if(t.adm==='potong')return {saldo:-a+f+k-b,kas:a,laba:f+k-b};
       return {saldo:-a+k-b,kas:a+f,laba:f+k-b};
@@ -1184,14 +1184,14 @@ function emptyHtml(){
 
 var accSig=null;
 function updateAccSelect(cur){
-  var tu=curType()==='topup',kt=false,banks=accsOf('bank'),wallets=tu?[]:accsOf('ewallet');
+  var tu=curType()==='topup',kt=false,banks=accsOf('bank'),wallets=accsOf('ewallet');
   var sig=(tu?'t':kt?'k'+cur.kas:'a')+banks.concat(wallets).map(function(a){return a.id+':'+a.name+':'+(cur.bal[a.id]||0)}).join('|');
   if(sig===accSig)return;accSig=sig;
   var sel=$('#fAcc'),prev=sel.value;
   function opts(l){return l.map(function(a){return '<option value="'+esc(a.id)+'" data-n="'+esc(a.name)+'" data-b="'+rp(cur.bal[a.id]||0)+'">'+esc(a.name)+' ('+rp(cur.bal[a.id]||0)+')</option>'}).join('')}
   var cashG=kt?'<optgroup label="Tunai"><option value="'+esc(KAS)+'" data-cash="1" data-n="Uang cash" data-b="'+rp(cur.kas)+'">Uang cash ('+rp(cur.kas)+')</option></optgroup>':'';
-  if(!banks.length&&!wallets.length&&!kt){sel.innerHTML='<option value="">'+(tu?'Belum ada rekening bank':'Belum ada rekening')+'</option>'}
-  else sel.innerHTML='<option value="">'+(tu?'Pilih bank pengirim':'Pilih rekening')+'</option>'+(banks.length?'<optgroup label="Bank">'+opts(banks)+'</optgroup>':'')+(wallets.length?'<optgroup label="E-wallet">'+opts(wallets)+'</optgroup>':'')+cashG;
+  if(!banks.length&&!wallets.length&&!kt){sel.innerHTML='<option value="">'+'Belum ada rekening'+'</option>'}
+  else sel.innerHTML='<option value="">'+(tu?'Pilih rekening pengirim':'Pilih rekening')+'</option>'+(banks.length?'<optgroup label="Bank">'+opts(banks)+'</optgroup>':'')+(wallets.length?'<optgroup label="E-wallet">'+opts(wallets)+'</optgroup>':'')+cashG;
   if(prev&&(accById(prev)||(kt&&prev===KAS)))sel.value=prev;
   renderPick();
   updateForm();
@@ -1515,7 +1515,8 @@ function openSheet(mode,id,kind){
       '<p>Mulai dengan jenis: <b>tarik</b>, <b>transfer</b>, <b>bayar</b>, <b>listrik</b>, <b>pulsa</b>, <b>kartu</b>, <b>jual</b> (tambah <b>modal 20rb</b>), <b>masuk</b>, <b>isi</b>, <b>keluar</b>, <b>topup</b>, atau <b>pindah</b>. Sisanya bebas urutan.</p>'+
       '<p>Nominal boleh 500000, 500.000, 500rb, atau 1,5jt. Tambahkan <b>admin 5000</b> dan <b>komisi 1500</b> bila ada.</p>'+
       '<p>Transfer ke bank lain: <b>transfer bri bca 1jt admin 6500 1234567890 ani</b>. Bank sumber dulu, lalu bank tujuan, nomor rekening boleh dikosongkan.</p>'+
-      '<p>Top up e-wallet: <b>topup bri dana 100rb admin 2500 081234567890 ani</b>. Bank pengirim, lalu e-wallet tujuan (dana, ovo, gopay, shopeepay, linkaja). Nomor HP boleh dikosongkan.</p>'+
+      '<p>Top up e-wallet: <b>topup bri dana 100rb admin 2500 081234567890 ani</b>. Rekening pengirim (bank atau e-wallet), lalu e-wallet tujuan (dana, ovo, gopay, shopeepay, linkaja). Nomor HP boleh dikosongkan.</p>'+
+      '<p>Top up dari e-wallet ke e-wallet: <b>topup ovo dana 100rb admin 2500</b>. Tanpa bank di pesan, e-wallet pertama jadi sumber, yang kedua jadi tujuan. Boleh sama, misalnya <b>topup dana dana 100rb 081234567890</b> (dari DANA kamu ke DANA pelanggan).</p>'+
       '<p>Impor file chat: di WhatsApp buka chat, Ekspor chat, Tanpa media, lalu pilih file .txt atau .zip di sini. Pesan yang bukan transaksi dilewati.</p>'+
       '<p>Tarik tunai: tulis <b>luar</b>, <b>dalam</b>, atau <b>potong</b>. Bila kosong dianggap luar.</p><p>Potongan bank (biaya dari bank, mengurangi laba): <b>pot 2500</b> atau <b>potongan 6500</b>.</p>'+
       '<p>Tulis nama rekening seperti di daftar saldo, misalnya BRI atau DANA. Kata yang tersisa menjadi nama pelanggan. Pindah saldo: <b>pindah bri dana 1jt fee 2500</b>, uang tunai ditulis <b>kas</b>.</p>'+
@@ -1638,6 +1639,8 @@ function waLine(raw,defDate){
   if(type==='pindah'&&state.role!=='owner')return {ok:false,msg:'Pindah saldo hanya bisa dicatat oleh pemilik.'};
   var T=type==='pindah'?null:TYPES[type];
   var i=1,amount=null,fee=0,kom=0,bf=0,modal=0,bt='',rek='',adm=null,accIds=[],name=[],err=null,low,v,tok,ew=null,hp='';
+  var ewSrc=false,ewSrcDone=false;
+  if(type==='topup'){var nb=false,ne=0;toks.slice(1).forEach(function(t0){var l0=t0.toLowerCase().replace(/[,;]+$/,'');if(WA_EW[waNorm(l0)])ne++;var r0=waAcc(l0,'bank');if(r0&&!r0.amb)nb=true});ewSrc=!nb&&ne>=2}
   var n1=(toks[1]||'').toLowerCase();
   if(((lk(type)==='tarik'||type==='setor')&&n1==='tunai')||(type==='isi'&&n1==='saldo')||(type==='topup'&&n1==='up'))i=2;
   for(;i<toks.length&&!err;i++){
@@ -1659,6 +1662,7 @@ function waLine(raw,defDate){
     if(type==='topup'){
       if(waNorm(low)==='ewallet')continue;
       var en=WA_EW[waNorm(low)];
+      if(en&&ewSrc&&!ewSrcDone){var rs=waAcc(low,'ewallet');if(rs&&!rs.amb){accIds.push(rs.id);ewSrcDone=true;continue}err='Sumber top up "'+tok+'" tidak ada di daftar saldo e-wallet.';break}
       if(en&&!ew){ew=en;continue}
       if(!hp&&/^(\+?62|0)\d{8,13}$/.test(low.replace(/[\s-]/g,''))){hp=low.replace(/[^\d+]/g,'');continue}
     }
@@ -1667,7 +1671,7 @@ function waLine(raw,defDate){
     if(type==='pindah'||T.acc){
       if(type==='pindah'&&(low==='kas'||low==='laci'||low==='tunai')&&accIds.length<2){accIds.push(KAS);continue}
       if(accIds.length<(type==='pindah'?2:1)){
-        var r=waAcc(low,type==='topup'?'bank':null);
+        var r=waAcc(low,type==='topup'?'bank':null);if(!r&&type==='topup')r=waAcc(low,'ewallet');
         if(r&&r.amb){err='Nama rekening "'+tok+'" cocok dengan lebih dari satu rekening.';break}
         if(r){accIds.push(r.id);continue}
       }
@@ -1686,10 +1690,10 @@ function waLine(raw,defDate){
   if(T.modal)t.modal=modal;
   if(T.dest&&bt){t.bt=bt;if(rek)t.rek=rek}
   if(T.acc){
-    var id=accIds[0],pool=type==='topup'?state.accs.filter(function(a){return a.kind==='bank'}):state.accs;
+    var id=accIds[0],pool=state.accs;if(type==='topup'){var bk=state.accs.filter(function(a){return a.kind==='bank'});if(bk.length)pool=bk}
     if(!id){
-      if(!pool.length)return {ok:false,msg:type==='topup'?'Belum ada rekening bank. Tambahkan bank dulu.':'Belum ada rekening. Tambahkan bank atau e-wallet dulu.'};
-      if(pool.length>1)return {ok:false,msg:'Nama '+(type==='topup'?'bank pengirim':'rekening')+' tidak ditemukan. Tulis seperti di daftar saldo, misalnya '+waShort(pool[0].name)+'.'};
+      if(!pool.length)return {ok:false,msg:'Belum ada rekening. Tambahkan bank atau e-wallet dulu.'};
+      if(pool.length>1)return {ok:false,msg:'Nama '+(type==='topup'?'rekening pengirim (bank atau e-wallet)':'rekening')+' tidak ditemukan. Tulis seperti di daftar saldo, misalnya '+waShort(pool[0].name)+'.'};
       id=pool[0].id;
     }
     t.acc=id;
@@ -2251,7 +2255,7 @@ function init(){
     if(T.modal)t.modal=num($('#fModal'));
     if(T.dest){t.bt=$('#fBt').value;t.rek=$('#fRek').value.replace(/\D/g,'')}
     if(k==='topup'){t.ew=$('#fEw').value;t.hp=$('#fHp').value.replace(/[^\d+]/g,'')}
-    if(T.acc&&!t.acc){err.textContent=k==='kartu'?'Pilih tujuan: bank penampung atau uang cash.':lt==='tarik'?'Pilih bank penampung. Tambahkan bank dulu di bagian saldo bila belum ada.':k==='topup'?'Pilih bank pengirim. Tambahkan bank dulu di bagian saldo bila belum ada.':'Tambahkan rekening bank atau e-wallet dulu di bagian saldo.';return}
+    if(T.acc&&!t.acc){err.textContent=k==='kartu'?'Pilih tujuan: bank penampung atau uang cash.':lt==='tarik'?'Pilih bank penampung. Tambahkan bank dulu di bagian saldo bila belum ada.':k==='topup'?'Pilih rekening pengirim. Tambahkan bank atau e-wallet dulu di bagian saldo bila belum ada.':'Tambahkan rekening bank atau e-wallet dulu di bagian saldo.';return}
     if(T.dest&&!t.bt){err.textContent='Pilih bank tujuan (bank penerima).';($('#fBtBtn')||$('#fBt')).focus();return}
     if(k==='topup'&&!t.ew){err.textContent='Pilih e-wallet tujuan.';($('#fEwBtn')||$('#fEw')).focus();return}
     if(lt==='tarik'&&t.adm==='potong'&&t.fee>t.amount){err.textContent='Biaya admin tidak boleh lebih besar dari nominal bila dipotong.';$('#fFee').focus();return}
