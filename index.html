@@ -980,6 +980,8 @@ function sum(list){
 /* ringkasan transaksi ditambah biaya pindah saldo */
 function mvFees(list){return list.reduce(function(a,m){return a+(m.type==='pindah'?(+m.fee||0):0)},0)}
 function agg(txList,mvList){var s=sum(txList),f=mvFees(mvList||[]);s.moveFee=f;s.keluar+=f;s.laba-=f;return s}
+/* uang tunai yang benar-benar masuk/keluar dari laci (bukan laba) */
+function cashFlow(list){var m=0,k=0;(list||[]).forEach(function(t){var e=fx(t).kas||0;if(e>0)m+=e;else k+=-e});return {masuk:m,keluar:k}}
 
 /* ---------- data contoh ---------- */
 var EXACC=[['acc-bri','BRI','bank',6000000],['acc-bni','BNI','bank',6000000],['acc-dana','DANA','ewallet',500000]];
@@ -1112,9 +1114,11 @@ function renderBalances(){
     '<div class="bsub"><div><span>Bank dan e-wallet</span><b class="'+(nonKas<0?'neg':'')+'">'+rp(nonKas)+'</b></div><div><span>Uang tunai laci</span><b class="'+(cur.kas<0?'neg':'')+'">'+rp(cur.kas)+'</b></div></div>'+
     '<small class="own">Hari ini '+rpS(delta)+'</small></div>';
   var tdT=state.txs.filter(function(x){return x.date===t}),tdM=state.mvs.filter(function(x){return x.date===t});
-  var td=agg(tdT,tdM);
+  var td=agg(tdT,tdM),cf=cashFlow(tdT);
   $('#stats').innerHTML=
     '<div><span>Transaksi hari ini</span><strong>'+td.n+'</strong></div>'+
+    '<div><span>Pemasukan hari ini</span><strong class="pos">'+rp(cf.masuk)+'</strong></div>'+
+    '<div><span>Pengeluaran hari ini</span><strong class="neg">'+rp(cf.keluar)+'</strong></div>'+
     '<div class="own"><span>Laba hari ini</span><strong class="'+(td.laba<0?'neg':td.laba>0?'pos':'')+'">'+rpS(td.laba)+'</strong></div>';
   return cur;
 }
@@ -1263,9 +1267,11 @@ function renderReport(){
   var m=$('#rMonth').value||currentMonth();
   var list=state.txs.filter(function(t){return t.date.slice(0,7)===m});
   var mvl=state.mvs.filter(function(x){return x.date.slice(0,7)===m});
-  var s=agg(list,mvl);
+  var s=agg(list,mvl),cfm=cashFlow(list);
   $('#rStats').innerHTML=
     '<div><span>Transaksi</span><strong>'+s.n+'</strong></div>'+
+    '<div><span>Pemasukan bulan ini</span><strong class="pos">'+rp(cfm.masuk)+'</strong></div>'+
+    '<div><span>Pengeluaran bulan ini</span><strong class="neg">'+rp(cfm.keluar)+'</strong></div>'+
     '<div><span>Total nominal</span><strong>'+rp(s.nominal)+'</strong></div>'+
     '<div><span>Admin dan komisi</span><strong>'+rp(s.fee+s.komisi)+'</strong></div>'+
     '<div><span>Laba bersih</span><strong class="'+(s.laba<0?'neg':s.laba>0?'pos':'')+'">'+rpS(s.laba)+'</strong></div>';
