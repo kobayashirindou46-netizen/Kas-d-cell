@@ -1450,6 +1450,7 @@ function renderBalances(){
   var td=agg(tdT,tdM),cf=cashFlow(tdT);
   $('#stats').innerHTML=
     '<div><span>Transaksi hari ini</span><strong>'+td.n+'</strong></div>'+
+    '<div class="own"><span>Omzet hari ini</span><strong>'+rp(td.nominal)+'</strong></div>'+
     (cf.masuk?'<div><span>Pemasukan hari ini</span><strong class="pos">'+rp(cf.masuk)+'</strong></div>':'')+
     (cf.keluar?'<div><span>Pengeluaran hari ini</span><strong class="neg">'+rp(cf.keluar)+'</strong></div>':'')+
     '<div class="own"><span>Laba hari ini</span><strong class="'+(td.laba<0?'neg':td.laba>0?'pos':'')+'">'+rpS(td.laba)+'</strong></div>';
@@ -1651,7 +1652,8 @@ function renderSettings(){
     (db?row('data-acct="staff"','Karyawan','Tambah atau hapus akun karyawan'):'')+
     row('data-tarif="tarif"','Tarif admin dan potongan','Atur tarif otomatis per nominal')+
     row('data-addmenu','Tambah menu transaksi','Buat jenis transaksi sendiri')+
-    row('data-wa','Tempel pesan WhatsApp','Impor catatan dari WhatsApp')+'</div></div>';
+    row('data-wa','Tempel pesan WhatsApp','Impor catatan dari WhatsApp')+
+    (db?row('data-acct="recover"','Pulihkan transaksi bot lama','Cek transaksi bot WhatsApp yang sempat tertinggal'):'')+'</div></div>';
   if(!own)h+='<div class="panel setp"><header><h2>Impor</h2></header><div class="srows">'+row('data-wa','Tempel pesan WhatsApp','Impor catatan dari WhatsApp')+'</div></div>';
   if(db)h+='<div class="panel setp"><div class="srows">'+row('data-acct="out"','Keluar','Keluar dari akun ini di perangkat ini')+'</div></div>';
   $('#setBody').innerHTML=h;
@@ -2858,6 +2860,27 @@ function glueBoot(){
         .then(function(){return commitAll([{ref:fs.doc('users/'+uid),data:{legacyDone:true},merge:true}])});
     });
   }
+  /* cek transaksi yang sempat tercatat bot WhatsApp ke lokasi lama (sebelum bot diarahkan ke toko ini), lalu salin ke buku kas toko ini bila belum ada */
+  function recoverBot(){
+    var base='shops/'+state.shopId+'/';
+    toast('Memeriksa transaksi bot yang tertinggal...');
+    return Promise.all(['tx','mv'].map(function(c){return fs.collection(c).get()})).then(function(r){
+      var jobs=[],found=0;
+      ['tx','mv'].forEach(function(c,i){
+        r[i].docs.forEach(function(d){
+          var x=d.data();
+          if(typeof x.wa==='string'&&x.wa.indexOf('bot:')===0){
+            found++;
+            jobs.push(fs.collection(base+c).where('wa','==',x.wa).limit(1).get().then(function(ex){
+              if(ex.empty)return fs.doc(base+c+'/'+d.id).set(x);
+            }));
+          }
+        });
+      });
+      if(!found){toast('Tidak ada transaksi bot yang tertinggal.');return}
+      return Promise.all(jobs).then(function(){toast('Pemeriksaan selesai. Transaksi yang tertinggal sudah dipulihkan.')});
+    }).catch(function(e){toast('Gagal memeriksa: '+(e&&e.message||e))});
+  }
   function boot(u,prof){
     if(prof.role==='owner'&&!prof.legacyDone){
       wall(true);$('#wHint').textContent='Memindahkan data lama ke akun Anda. Jangan tutup halaman ini...';
@@ -2895,6 +2918,7 @@ function glueBoot(){
     var a=ev.target.closest&&ev.target.closest('[data-acct]');if(a){
       if(a.dataset.acct==='out'){auth.signOut().then(function(){location.reload()},function(){location.reload()})}
       else if(a.dataset.acct==='pw'){var em=auth.currentUser&&auth.currentUser.email;if(em)auth.sendPasswordResetEmail(em).then(function(){toast('Tautan ubah kata sandi dikirim ke '+em)},function(e){toast(fbMsg(e))})}
+      else if(a.dataset.acct==='recover'){recoverBot()}
       else openStaff();return;
     }
     var d=ev.target.closest&&ev.target.closest('[data-delstaff]');if(d)delStaff(d.dataset.delstaff,d);
