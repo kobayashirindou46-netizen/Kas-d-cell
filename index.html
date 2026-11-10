@@ -1995,7 +1995,7 @@ function waLine(raw,defDate){
   if(type==='pindah'&&state.role!=='owner')return {ok:false,msg:'Pindah saldo hanya bisa dicatat oleh pemilik.'};
   var T=type==='pindah'?null:TYPES[type];
   var i=1,amount=null,fee=0,kom=0,bf=0,modal=0,bt='',rek='',adm=null,accIds=[],name=[],err=null,low,v,tok,ew=null,hp='';
-  var ewSrc=false,ewSrcDone=false,pay=null,payAcc='',payWait=false;
+  var feeSet=false,bfSet=false,ewSrc=false,ewSrcDone=false,pay=null,payAcc='',payWait=false;
   if(type==='topup'){var nb=false,ne=0;toks.slice(1).forEach(function(t0){var l0=t0.toLowerCase().replace(/[,;]+$/,'');if(WA_EW[waNorm(l0)])ne++;var r0=waAcc(l0,'bank');if(r0&&!r0.amb)nb=true});ewSrc=!nb&&ne>=2}
   var n1=(toks[1]||'').toLowerCase();
   if(((lk(type)==='tarik'||type==='setor')&&n1==='tunai')||(type==='isi'&&n1==='saldo')||(type==='topup'&&n1==='up'))i=2;
@@ -2004,7 +2004,7 @@ function waLine(raw,defDate){
     if((low==='admin'||low==='adm'||low==='fee'||low==='komisi'||low==='kom'||low==='pot'||low==='potongan'||low==='pajak'||low==='modal')&&(type==='pindah'?low==='fee':(T.fee||(T.modal&&low==='modal')))){
       v=i+1<toks.length?waAmount(toks[i+1]):null;
       if(v==null){err='Tulis angka setelah "'+low+'", misalnya "'+low+' 5000".';break}
-      if(low==='komisi'||low==='kom')kom=v;else if(low==='modal')modal=v;else if(low==='pot'||low==='potongan'||low==='pajak')bf=v;else fee=v;
+      if(low==='komisi'||low==='kom')kom=v;else if(low==='modal')modal=v;else if(low==='pot'||low==='potongan'||low==='pajak'){bf=v;bfSet=true}else{fee=v;feeSet=true}
       i++;continue;
     }
     if(lk(type)==='tarik'&&ADM[low]){adm=low;continue}
@@ -2041,7 +2041,17 @@ function waLine(raw,defDate){
     name.push(tok.replace(/[,;]+$/,''));
   }
   if(err)return {ok:false,msg:err};
-  if(!amount)return {ok:false,msg:'Nominal tidak ditemukan. Tulis angka seperti 500000, 500rb, atau 1,5jt.'};
+  if(T&&T.onlyAdm){
+    /* Kartu ATM nasabah: hanya biaya admin yang masuk laci, tanpa nominal */
+    if(!fee&&amount){fee=amount;feeSet=true}
+    amount=0;
+    if(!fee)return {ok:false,msg:'Tulis biaya admin kartu, misalnya "kartu admin 5000".'};
+  }else if(!amount)return {ok:false,msg:'Nominal tidak ditemukan. Tulis angka seperti 500000, 500rb, atau 1,5jt.'};
+  /* admin / potongan bank tidak ditulis -> pakai tarif otomatis dari pengaturan, seperti di formulir input */
+  if(T&&T.fee&&!T.onlyAdm){
+    if(!feeSet&&tiersOf('adm').length)fee=tierFee(tiersOf('adm'),amount);
+    if(!bfSet&&tiersOf('bf').length)bf=tierFee(tiersOf('bf'),amount);
+  }
   date=date||defDate||today();
   if(type==='pindah'){
     if(accIds.length<2)return {ok:false,msg:'Tulis dua rekening, asal lalu tujuan. Contoh: pindah bri dana 1jt.'};
@@ -2049,6 +2059,7 @@ function waLine(raw,defDate){
     return {ok:true,kind:'mv',obj:{date:date,type:'pindah',from:accIds[0],to:accIds[1],amount:amount,fee:fee,note:'Dari WhatsApp'}};
   }
   var t={date:date,type:type,name:name.join(' '),amount:amount,fee:T.fee?fee:0,komisi:T.fee?kom:0,bf:T.fee?bf:0,acc:'',note:'Dari WhatsApp'};
+  if(T.onlyAdm){t.acc=KAS;t.adm='luar'}
   if(T.modal)t.modal=modal;
   if(T.pay){
     t.pay=pay||'cash';
