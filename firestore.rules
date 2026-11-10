@@ -4,33 +4,62 @@ service cloud.firestore {
 
     function uref(uid) { return /databases/$(database)/documents/users/$(uid); }
     function signed()  { return request.auth != null && exists(uref(request.auth.uid)); }
-    function isOwner() { return signed() && get(uref(request.auth.uid)).data.role == 'owner'; }
+    function me()      { return get(uref(request.auth.uid)).data; }
+    function myShop()  { return me().get('shopId', null); }
+    function isOwner() { return signed() && me().role == 'owner'; }
+    function inShop(s)      { return signed() && myShop() == s; }
+    function isShopOwner(s) { return inShop(s) && me().role == 'owner'; }
 
-    // Profil pengguna: tiap orang membaca profilnya sendiri, pemilik mengelola semuanya.
+    // SEMENTARA (migrasi): pemilik lama (tercatat di meta/owner) boleh membaca data lama.
+    // Setelah data berhasil pindah, hapus fungsi ini dan 4 blok "data lama" di bawah.
+    function legacyOwner() {
+      return isOwner()
+        && exists(/databases/$(database)/documents/meta/owner)
+        && get(/databases/$(database)/documents/meta/owner).data.uid == request.auth.uid;
+    }
+
+    // Profil pengguna
     match /users/{uid} {
-      allow get: if request.auth != null && (request.auth.uid == uid || isOwner());
-      allow list: if isOwner();
-      // Pemilik pertama: hanya bila belum ada pemilik, dan dibuat bersamaan dengan meta/owner.
+      allow get: if request.auth != null
+                 && (request.auth.uid == uid
+                     || (isOwner() && resource.data.get('shopId', null) == myShop()));
+      allow list: if isOwner() && (legacyOwner() || resource.data.shopId == myShop());
+
+      // Daftar mandiri: jadi pemilik toko baru (shopId = uid sendiri).
+      // Pemilik membuat karyawan di tokonya sendiri.
       allow create: if (request.auth != null && request.auth.uid == uid
                         && request.resource.data.role == 'owner'
-                        && !exists(/databases/$(database)/documents/meta/owner)
-                        && getAfter(/databases/$(database)/documents/meta/owner).data.uid == uid)
-                    || (isOwner() && request.resource.data.role == 'staff');
-      allow update, delete: if isOwner() && resource.data.role == 'staff';
-    }
-    match /meta/owner {
-      allow get: if request.auth != null;
-      allow create: if request.auth != null && !exists(/databases/$(database)/documents/meta/owner)
-                    && request.resource.data.uid == request.auth.uid;
+                        && request.resource.data.shopId == uid)
+                    || (isOwner()
+                        && request.resource.data.role == 'staff'
+                        && request.resource.data.shopId == myShop());
+
+      allow update: if (request.auth != null && request.auth.uid == uid && isOwner()
+                        && request.resource.data.role == 'owner'
+                        && request.resource.data.shopId == uid)
+                    || (isOwner()
+                        && resource.data.role == 'staff'
+                        && request.resource.data.role == 'staff'
+                        && request.resource.data.shopId == request.auth.uid
+                        && resource.data.get('shopId', null) in [myShop(), null]);
+
+      allow delete: if isOwner() && resource.data.role == 'staff'
+                    && resource.data.get('shopId', null) == myShop();
     }
 
-    // Data buku kas
-    match /tx/{id} {
-      allow read, create: if signed();
-      allow update, delete: if isOwner();
+    // Data buku kas: satu toko satu ruang, tidak bisa dilihat toko lain
+    match /shops/{shopId}/tx/{id} {
+      allow read, create: if inShop(shopId);
+      allow update, delete: if isShopOwner(shopId);
     }
-    match /acc/{id} { allow read: if signed(); allow write: if isOwner(); }
-    match /mv/{id}  { allow read: if signed(); allow write: if isOwner(); }
-    match /settings/{id} { allow read: if signed(); allow write: if isOwner(); }
+    match /shops/{shopId}/acc/{id}      { allow read: if inShop(shopId); allow write: if isShopOwner(shopId); }
+    match /shops/{shopId}/mv/{id}       { allow read: if inShop(shopId); allow write: if isShopOwner(shopId); }
+    match /shops/{shopId}/settings/{id} { allow read: if inShop(shopId); allow write: if isShopOwner(shopId); }
+
+    // Data lama (SEMENTARA, hanya baca, untuk migrasi)
+    match /tx/{id}       { allow read: if legacyOwner(); }
+    match /acc/{id}      { allow read: if legacyOwner(); }
+    match /mv/{id}       { allow read: if legacyOwner(); }
+    match /settings/{id} { allow read: if legacyOwner(); }
   }
 }
