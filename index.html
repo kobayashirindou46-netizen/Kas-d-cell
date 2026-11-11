@@ -1182,7 +1182,7 @@ setTimeout(hide,3500)})()</script>
         <div class="scroll" id="rType"></div>
       </div>
       <div class="panel own">
-        <header><h2>Tutup kas harian</h2><button class="btn small primary" type="button" data-tarif="tutup">Tutup kas</button></header>
+        <header><h2>Tutup kas harian</h2><span class="hact2"><button class="btn small" type="button" data-tarif="cari">Cari selisih</button> <button class="btn small primary" type="button" data-tarif="tutup">Tutup kas</button></span></header>
         <div class="body" id="rClose"></div>
       </div>
     </div>
@@ -1710,6 +1710,7 @@ function renderSettings(){
     row('data-addmenu','Tambah menu transaksi','Buat jenis transaksi sendiri')+
     row('data-wa','Tempel pesan WhatsApp','Impor catatan dari WhatsApp')+
     row('data-tarif="tutup"','Tutup kas harian','Hitung laci dan saldo, catat selisih hari ini')+
+    row('data-tarif="cari"','Cari penyebab selisih laci','Telusuri transaksi yang mengubah uang laci')+
     row('data-tarif="minsaldo"','Batas saldo menipis','Peringatan bila saldo di bawah batas')+
     row('data-exp="csvall"','Unduh semua transaksi (Excel)','File CSV berisi semua transaksi')+
     row('data-exp="backup"','Cadangan lengkap','Simpan semua data toko ke satu file')+
@@ -1927,6 +1928,12 @@ function openSheet(mode,id,kind){
       tacc.map(function(a,i){return '<div class="field"><label class="l" for="tkA'+i+'">'+esc(a.name)+' <small>(buku: '+rp(cur.bal[a.id]||0)+')</small></label><input id="tkA'+i+'" type="text" inputmode="numeric" placeholder="0" data-money data-tk="'+esc(a.id)+'"></div>'}).join('')+
       '<div class="preview" id="tkSum" aria-live="polite"></div>'+
       '<label class="chk"><input type="checkbox" id="tkAdj" checked> Samakan saldo di buku dengan angka ini</label>'+noteIn();
+  }else if(mode==='cari'){
+    title='Cari penyebab selisih laci';ok='Tutup';
+    var cd=new Date();cd.setDate(cd.getDate()-6);
+    body='<p class="hint">Menampilkan perubahan uang laci per hari dan transaksi yang mencurigakan. Bandingkan angka per hari dengan uang yang sebenarnya Anda hitung.</p>'+
+      '<div class="row2"><div class="field"><label class="l" for="cFrom">Dari</label><input id="cFrom" type="date" value="'+ymd(cd)+'"></div><div class="field"><label class="l" for="cTo">Sampai</label><input id="cTo" type="date" value="'+today()+'"></div></div>'+
+      '<div id="cariOut"></div>';
   }else if(mode==='minsaldo'){
     var macc=accsOf('bank').concat(accsOf('ewallet')),mm=state.settings.minSaldo||{};
     title='Batas saldo menipis';ok='Simpan';
@@ -1974,6 +1981,7 @@ function openSheet(mode,id,kind){
   document.querySelectorAll('#shBody [data-d]').forEach(function(el){el.addEventListener('input',function(){el.value=digits(el.value);hitungSum()})});
   if(mode==='hitung')hitungSum();
   if(mode==='tutup')tutupSum();
+  if(mode==='cari'){['#cFrom','#cTo'].forEach(function(q){$(q).addEventListener('change',cariRender)});cariRender()}
   var first=$('#shBody input,#shBody select');if(first)first.focus();
 }
 function showSheet(title,body,ok){
@@ -1986,6 +1994,41 @@ function closeSheet(){$('#sheet').hidden=true;sh={}}
 function hitungTotal(){
   var t=0;document.querySelectorAll('#shBody [data-d]').forEach(function(el){t+=(+el.dataset.d)*(parseInt(digits(el.value),10)||0)});
   var c=$('#dnCoin');return t+(c?num(c):0);
+}
+function cariRender(){
+  var from=$('#cFrom').value,to=$('#cTo').value,out=$('#cariOut');if(!out)return;
+  if(!from||!to||from>to){out.innerHTML='<div class="gempty">Pilih rentang tanggal yang benar.</div>';return}
+  var rows=[],dup={},seen={};
+  state.txs.forEach(function(t){if(t.date<from||t.date>to)return;var k=[t.type,t.amount,t.fee,(t.name||'').toLowerCase(),t.date].join('|');dup[k]=(dup[k]||0)+1});
+  state.txs.forEach(function(t){
+    if(t.date<from||t.date>to)return;
+    var e=fx(t),T=TYPES[t.type]||{},fl=[],fixv=null;
+    if(T.onlyAdm&&(+t.amount||0)>0){fl.push('Kartu ATM berisi nominal (seharusnya hanya admin)');fixv=+t.amount}
+    else if(T.fee&&!T.onlyAdm&&!(+t.fee)&&!(lk(t.type)==='tarik'&&t.adm==='potong'))fl.push('Admin Rp0');
+    var k=[t.type,t.amount,t.fee,(t.name||'').toLowerCase(),t.date].join('|');
+    if(dup[k]>1){seen[k]=(seen[k]||0)+1;fl.push('Kembar '+dup[k]+' kali (mungkin tercatat dobel)'+(seen[k]===1?'':', salinan ke-'+seen[k]));if(seen[k]>1&&fixv===null)fixv=-e.kas}
+    if(!e.kas&&!fl.length)return;
+    rows.push({date:t.date,at:t.createdAt||0,label:(T.label||t.type)+(t.name?' · '+t.name:''),amount:t.amount||0,kas:e.kas,fl:fl,fix:fixv,bot:!!t.wa,pay:t.pay});
+  });
+  state.mvs.forEach(function(m){
+    if(m.date<from||m.date>to)return;var v=+m.amount||0,f=+m.fee||0,ek=0;
+    if(m.type==='tambah'&&m.acc===KAS)ek=v;else if(m.type==='kurang'&&m.acc===KAS)ek=-v;
+    else if(m.type==='pindah'){if(m.from===KAS)ek-=v+f;if(m.to===KAS)ek+=v}
+    if(!ek)return;
+    rows.push({date:m.date,at:m.createdAt||0,label:(MVL[m.type]||m.type)+(m.type==='pindah'?' '+accName(m.from)+' → '+accName(m.to):''),amount:v,kas:ek,fl:[],fix:null,bot:!!m.wa});
+  });
+  rows.sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:a.at-b.at});
+  var days={};rows.forEach(function(r){var d=days[r.date]||(days[r.date]={n:0,k:0});d.n++;d.k+=r.kas});
+  var h='<div class="panel" style="margin-top:12px"><header><h2>Perubahan laci per hari</h2></header><div class="body">'+
+    (Object.keys(days).length?Object.keys(days).sort().map(function(d){return '<div class="clrow"><span class="cd">'+esc(dayLabel(d))+' <small class="muted">'+days[d].n+' transaksi</small></span><b class="mono '+(days[d].k<0?'neg':'pos')+'">'+rpS(days[d].k)+'</b></div>'}).join(''):'<div class="gempty">Tidak ada transaksi yang mengubah laci di rentang ini.</div>')+'</div></div>';
+  var sus=rows.filter(function(r){return r.fl.length});
+  var fixTot=sus.reduce(function(a,r){return a+(r.fix||0)},0);
+  h+='<div class="panel" style="margin-top:12px"><header><h2>Dicurigai ('+sus.length+')</h2></header><div class="body">'+
+    (sus.length?sus.map(function(r){return '<div class="clrow"><span class="cd">'+esc(dayLabel(r.date))+' · '+esc(r.label)+'<small class="muted" style="display:block">'+esc(r.fl.join('; '))+(r.bot?' · dicatat lewat bot':'')+'</small></span><span class="mono" style="text-align:right">'+rp(r.amount)+'<small class="muted" style="display:block">laci '+rpS(r.kas)+(r.fix?' · bila dibetulkan '+rpS(r.fix):'')+'</small></span></div>'}).join('')+
+      (fixTot?'<p class="hint" style="margin-top:10px">Kalau yang bernilai jelas itu dibetulkan, uang laci di buku berubah <b>'+rpS(fixTot)+'</b>. "Admin Rp0" tidak bisa dihitung otomatis: buka Riwayat lalu hapus atau catat ulang dengan admin yang benar.</p>':'<p class="hint" style="margin-top:10px">"Admin Rp0" tidak bisa dihitung otomatis: hapus lalu catat ulang di Riwayat dengan admin yang benar.</p>'):'<div class="gempty">Tidak ada yang mencurigakan di rentang ini.</div>')+'</div></div>';
+  h+='<details class="panel" style="margin-top:12px"><summary style="padding:14px 16px;cursor:pointer;font-weight:600">Semua yang mengubah laci ('+rows.length+')</summary><div class="body">'+
+    rows.map(function(r){return '<div class="clrow"><span class="cd">'+esc(dayLabel(r.date))+' · '+esc(r.label)+(r.pay==='transfer'?' <small class="muted">(bayar transfer)</small>':'')+'</span><b class="mono '+(r.kas<0?'neg':'pos')+'">'+rpS(r.kas)+'</b></div>'}).join('')+'</div></details>';
+  out.innerHTML=h;
 }
 function tutupRows(){
   var cur=calc(),out=[];
@@ -2013,7 +2056,7 @@ function sheetSubmit(ev){
   function ok(msg){closeSheet();toast(msg)}
   function bad(){err.textContent='Belum tersimpan. Coba lagi.'}
   function busy(p,msg){$('#shOk').disabled=true;p.then(function(){ok(msg)},function(){$('#shOk').disabled=false;bad()})}
-  if(m==='info'||m==='aksi'||m==='tema'){closeSheet();return}
+  if(m==='info'||m==='aksi'||m==='tema'||m==='cari'){closeSheet();return}
   if(m==='wa'){waSubmit();return}
   if(m==='staff'){if(typeof glueStaffAdd==='function')glueStaffAdd();return}
   if(m==='tutup'){
