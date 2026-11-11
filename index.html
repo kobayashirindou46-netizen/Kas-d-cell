@@ -760,6 +760,10 @@ main>section:not([hidden])>*:nth-child(n+6){animation-delay:.34s}
 .payseg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .paybtn{height:44px;border-radius:12px;border:1px solid var(--rule);background:var(--surface2);color:var(--ink);font:600 14px var(--f-body,inherit);cursor:pointer;transition:transform .15s,background .2s,border-color .2s,color .2s}
 .paybtn:active{transform:scale(.95)}
+.rchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.rchip{height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--rule);background:var(--surface2);color:var(--ink);font:600 13px var(--f-body,inherit);cursor:pointer;transition:transform .15s,background .2s}
+.rchip:active{transform:scale(.94)}
+#recvField:not([hidden]){animation:stagIn .35s ease both}
 .paybtn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 #payField:not([hidden]){animation:stagIn .35s ease both}
 /* label navbar: tersembunyi, baru muncul (dengan font dan animasi sendiri) saat berada di menu itu */
@@ -1088,6 +1092,7 @@ setTimeout(hide,3500)})()</script>
             <legend>Tipe admin</legend>
             <div class="adms" id="adms"></div>
           </fieldset>
+          <div class="field" id="recvField" hidden><label class="l" for="fRecv">Uang diterima dari pelanggan <small>(opsional, untuk hitung kembalian)</small></label><input id="fRecv" class="big" type="text" inputmode="numeric" placeholder="0"><div class="rchips" id="rchips"><button type="button" class="rchip" data-r="pas">Uang pas</button><button type="button" class="rchip" data-r="20000">20.000</button><button type="button" class="rchip" data-r="50000">50.000</button><button type="button" class="rchip" data-r="100000">100.000</button></div></div>
           <div class="field"><label class="l" for="fNote">Catatan</label><input id="fNote" type="text" maxlength="120" placeholder="Opsional, misalnya nomor referensi"></div>
           <div class="preview" id="preview" aria-live="polite"></div>
           <div class="formact">
@@ -1715,7 +1720,7 @@ function buildChips(){
   $('#admChips').innerHTML=p.adm.map(function(v){return '<button type="button" data-chip="fFee" data-v="'+v+'"><small>ADMIN</small>'+rp(v)+'</button>'}).join('');
   $('#bfChips').innerHTML=p.pot.map(function(v){return '<button type="button" data-chip="fBf" data-v="'+v+'"><small>POT</small>'+rp(v)+'</button>'}).join('');
 }
-var payMode='cash';
+var payMode='cash',lastDue=0;
 function draft(){return {pay:payMode,payAcc:($('#fPayAcc')||{}).value||'',type:curType(),amount:num($('#fAmount')),fee:num($('#fFee')),komisi:num($('#fKom')),bf:num($('#fBf')),modal:num($('#fModal')),adm:curAdm(),acc:$('#fAcc').value}}
 /* tarif otomatis: batas nominal -> biaya, disimpan pemilik di pengaturan */
 var auto={adm:null,bf:null},touched={adm:false,bf:false};
@@ -1770,7 +1775,7 @@ function updateForm(){
   $('#fAmountL').textContent=T.amount;
   $('#fName').placeholder=lt==='keluar'?'Wajib diisi':'Opsional';
   var d=draft();if(!T.fee){d.fee=0;d.komisi=0;d.bf=0}
-  if(oa){d.komisi=0;d.bf=0;d.adm='luar'}
+  if(oa){d.komisi=0;d.bf=0;d.adm='luar';d.amount=0}
   var e=fx(d);
   function line(l,v){return '<div><span>'+l+'</span><b class="'+(v<0?'neg':v>0?'pos':'')+'">'+rpS(v)+'</b></div>'}
   var h='';
@@ -1784,6 +1789,19 @@ function updateForm(){
   }
   if(T.acc&&!oa){var id=$('#fAcc').value;if(id!==KAS)h+=line((lt==='tarik'?'Saldo bank ':'Saldo ')+(id?esc(accName(id)):'rekening'),e.saldo)}
   if(e.ex&&e.ex[0])h+=line('Saldo '+esc(accName(e.ex[0].acc))+' (bayar transfer)',e.ex[0].v);
+  /* kembalian: hanya bantuan hitung, tidak disimpan. Muncul bila pelanggan membayar tunai ke laci */
+  /* uang tunai yang harus dibayar pelanggan: tarik/kartu hanya admin (bila admin dibayar tunai), lainnya sebesar uang yang masuk laci */
+  var due=0;
+  if(lt==='tarik')due=(oa||curAdm()==='luar')?(+d.fee||0):0;
+  else if(e.kas>0&&!(e.ex&&e.ex[0]))due=e.kas;
+  lastDue=due;
+  var cashIn=due>0;
+  $('#recvField').hidden=!cashIn;
+  var rv=cashIn?num($('#fRecv')):0;
+  if(cashIn&&rv>0){
+    var kb=rv-due;
+    h+='<div><span>Pelanggan harus bayar</span><b>'+rp(due)+'</b></div><div><span>Uang diterima</span><b>'+rp(rv)+'</b></div>'+(kb>=0?'<div><span>Kembalian</span><b class="pos">'+rp(kb)+'</b></div>':'<div><span>Masih kurang</span><b class="neg">'+rp(-kb)+'</b></div>')+'<hr>';
+  }
   $('#preview').innerHTML=h+line('Uang tunai laci',e.kas)+(state.role==='owner'?line('Laba',e.laba):'');
 }
 function fmtInput(el,cb){el.addEventListener('input',function(){var d=digits(el.value);el.value=d?fmt(+d):'';if(cb)cb()})}
@@ -2661,7 +2679,8 @@ function init(){
   mpInit('jMonth');mpInit('tMonth',true);mpInit('rMonth');
   $('#fFee').addEventListener('input',function(ev){if(ev.isTrusted)touched.adm=true});
   $('#fBf').addEventListener('input',function(ev){if(ev.isTrusted)touched.bf=true});
-  ['#fAmount','#fFee','#fKom','#fBf','#fModal'].forEach(function(s){fmtInput($(s),updateForm)});
+  ['#fAmount','#fFee','#fKom','#fBf','#fModal','#fRecv'].forEach(function(s){fmtInput($(s),updateForm)});
+  $('#rchips').addEventListener('click',function(ev){var b=ev.target.closest('.rchip');if(!b)return;var v=b.dataset.r==='pas'?lastDue:+b.dataset.r;$('#fRecv').value=v>0?fmt(v):'';updateForm()});
   function onTgl(k,id){$(id).addEventListener('change',function(ev){
     if(!tiersOf(k).length){ev.target.checked=false;if(state.role==='owner')openSheet('tarif');else toast('Tarif otomatis belum diatur oleh pemilik');return}
     auto[k]=ev.target.checked;touched[k]=false;updateForm();
@@ -2679,7 +2698,7 @@ function init(){
     ev.preventDefault();
     var k=curType(),T=TYPES[k],err=$('#formErr');err.textContent='';$('#formOk').textContent='';
     var lt=lk(k);
-    var t={date:$('#fDate').value||today(),type:k,name:$('#fName').value.trim(),amount:num($('#fAmount')),fee:T.fee?num($('#fFee')):0,komisi:T.fee&&!T.onlyAdm?num($('#fKom')):0,bf:T.fee&&!T.onlyAdm?num($('#fBf')):0,acc:T.onlyAdm?KAS:(T.acc?$('#fAcc').value:''),note:$('#fNote').value.trim(),createdAt:Date.now()};
+    var t={date:$('#fDate').value||today(),type:k,name:$('#fName').value.trim(),amount:T.onlyAdm?0:num($('#fAmount')),fee:T.fee?num($('#fFee')):0,komisi:T.fee&&!T.onlyAdm?num($('#fKom')):0,bf:T.fee&&!T.onlyAdm?num($('#fBf')):0,acc:T.onlyAdm?KAS:(T.acc?$('#fAcc').value:''),note:$('#fNote').value.trim(),createdAt:Date.now()};
     if(lt==='tarik')t.adm=T.onlyAdm?'luar':curAdm();
     if(T.modal)t.modal=num($('#fModal'));
     if(T.dest){t.bt=$('#fBt').value;t.rek=$('#fRek').value.replace(/\D/g,'')}
@@ -2694,7 +2713,7 @@ function init(){
     if(T.pay){t.pay=payMode;if(payMode==='transfer'){t.payAcc=$('#fPayAcc').value;if(!t.payAcc){err.textContent='Pilih rekening tujuan transfer pelanggan. Tambahkan rekening dulu bila belum ada.';return}}}
     var b=$('#save');b.disabled=true;
     store.add(t).then(function(){
-      ['#fName','#fAmount','#fFee','#fKom','#fBf','#fModal','#fNote','#fHp'].forEach(function(s){$(s).value=''});
+      ['#fName','#fAmount','#fFee','#fKom','#fBf','#fModal','#fNote','#fHp','#fRecv'].forEach(function(s){$(s).value=''});
       touched={adm:false,bf:false};$('#fRek').value='';$('#fBt').selectedIndex=0;
       if(T.pay)setPay('cash');else updateForm();(T.onlyAdm?$('#fFee'):$('#fAmount')).focus();
       var shown=T.onlyAdm?t.fee:t.amount,ttl=T.label+(t.name?' \u00b7 '+t.name:'')+(shown?' \u00b7 '+rp(shown):'');
