@@ -52,6 +52,11 @@ service cloud.firestore {
       allow read, create: if inShop(shopId);
       allow update, delete: if isShopOwner(shopId);
     }
+    // Utang piutang: karyawan boleh mencatat dan mencatat cicilan, hanya pemilik yang boleh menghapus
+    match /shops/{shopId}/debts/{id} {
+      allow read, create, update: if inShop(shopId);
+      allow delete: if isShopOwner(shopId);
+    }
     match /shops/{shopId}/acc/{id}      { allow read: if inShop(shopId); allow write: if isShopOwner(shopId); }
     match /shops/{shopId}/mv/{id}       { allow read: if inShop(shopId); allow write: if isShopOwner(shopId); }
     match /shops/{shopId}/settings/{id} { allow read: if inShop(shopId); allow write: if isShopOwner(shopId); }
